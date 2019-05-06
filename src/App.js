@@ -1,26 +1,36 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import {Provider} from 'react-redux'
+import {HashRouter} from 'react-router-dom'
+import router from './router'
+import store from './redux/store'
+
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Provider store={store}>
+      <HashRouter>
+        {router}
+      </HashRouter>
+    </Provider>
   );
 }
 
 export default App;
+
+/*
+installed: 
+socket.io
+axios
+massive
+react-router-dom
+dotenv
+express
+express-session
+bcryptjs
+redux
+react-redux
+chessboard.jsx
+chess.js
+*/
+
+//PvPGame component: contains human vs human chess
