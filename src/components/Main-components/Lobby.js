@@ -4,7 +4,7 @@ export default class Lobby extends Component{
     render(){
         return(
             <div>
-                <h1>Lobby</h1>
+                <h3>Lobby</h3>
                 {this.props.children}
             </div>
         )

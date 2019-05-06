@@ -13,7 +13,7 @@ create table login (
 
 create table stats (
     id serial primary key,
-    user_id int references users(id),
+    user_id serial references users(id),
     wins int,
     losses int,
     draws int,
