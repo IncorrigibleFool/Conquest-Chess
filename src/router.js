@@ -1,5 +1,5 @@
 import React from 'react'
-import {Switch, Route} from 'react-router-dom'
+import {Switch, Route, Redirect} from 'react-router-dom'
 import Login from './components/Login'
 import LoginForm from './components/LoginForm'
 import Register from './components/Register'
@@ -17,12 +17,15 @@ import GameChat from './components/Main-components/Game-components/GameChat'
 
 export default (
     <Switch>
-        <Route exact path='/' component={() => (
+        <Route exact path='/'>
+            <Redirect to='/login'/>
+        </Route>
+        <Route path='/login' component={() => (
             <Login>
                 <LoginForm/>
             </Login>
         )}/>
-        <Route path='/register' component={() => (
+        <Route exact path='/register' component={() => (
             <Register>
                 <RegisterForm/>
             </Register>

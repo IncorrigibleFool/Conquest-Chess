@@ -29,6 +29,8 @@ express-session
 bcryptjs
 redux
 react-redux
+chart.js
+react-chartjs-2
 chessboard.jsx
 chess.js
 */

@@ -1,7 +1,17 @@
-import React from 'react'
+import React, {Component} from 'react'
+import {Link} from 'react-router-dom'
 
-export default function Account(){
-    return(
-        <h3>Account</h3>
-    )
+export default class Account extends Component{
+    
+    
+    render(){
+        return(
+            <>
+                <h3>Account</h3>
+                <Link to='/main/lobby'>
+                    <button>Back</button>
+                </Link>
+            </>
+        )
+    }
 }

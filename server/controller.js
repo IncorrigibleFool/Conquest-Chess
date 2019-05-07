@@ -5,6 +5,11 @@ module.exports = {
         const db = req.app.get('db')
         const {username, password, firstname, lastname, email} = req.body
         const {session} = req
+
+        if(!username || !password || !firstname || !lastname || !email){
+            return res.sendStatus(400)
+        }
+
         let emailTaken = await db.checkEmail({email})
         emailTaken = + emailTaken[0].count
         let usernameTaken = await db.checkUsername({username})
@@ -29,11 +34,11 @@ module.exports = {
     login: async (req, res) => {
         const db = req.app.get('db')
         const {session} = req
-        const {username} = req.body
+        const {username, password} = req.body
         try{
             let user = await db.login({username})
             session.user = user[0]
-            const authenticated = bcrypt.compareSync(req.body.password, user[0].password)
+            const authenticated = bcrypt.compareSync(password, user[0].password)
 
             if (authenticated){
                 res.send({authenticated, id: user[0].id})
@@ -60,6 +65,11 @@ module.exports = {
         }catch(err){
             res.sendStatus(500)
         }
+    },
+
+    updateAccountInfo: async (req, res) => {
+        const db = req.app.get('db')
+        const {session} = req
     },
 
     getStats: async (req, res) => {

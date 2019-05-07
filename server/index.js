@@ -4,8 +4,9 @@ const massive = require('massive')
 const session = require('express-session')
 const app = express()
 const ctrl = require('./controller')
+const io = require('socket.io')()
 
-const {SERVER_PORT, SESSION_SECRET, CONNECTION_STRING} = process.env
+const {SERVER_PORT, SOCKET_PORT, SESSION_SECRET, CONNECTION_STRING} = process.env
 
 //middleware
 app.use(express.json())
@@ -17,6 +18,15 @@ app.use(session({
         maxAge: 1000 * 60 * 60 * 24
     }
 }))
+
+//socket
+io.on('connection', (socket) => {
+    console.log('new connection')
+
+    socket.on('message', (msg) => {
+        console.log('got message: ' + msg)
+    })
+})
 
 //database
 massive(CONNECTION_STRING).then(dbInstance => {
