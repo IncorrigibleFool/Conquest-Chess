@@ -30,35 +30,42 @@ export default (
                 <RegisterForm/>
             </Register>
         )}/>
-        <Route path='/main' component={() => (
+        <Route exact path='/main' component={() => (
+            <Redirect to='/main/lobby'/>
+        )}/> 
+        <Route path='/main/lobby' component={() => (
             <Main>
-                <Switch>
-                    <Route path='/main/lobby' component={() => (
-                        <Navbar>
-                            <Lobby>
-                                <Matchmaker/>
-                                <LobbyChat/>
-                            </Lobby>
-                        </Navbar>
-                    )}/>
-                    <Route path='/main/stats' component={() => (
-                        <Navbar>
-                            <Stats/>
-                        </Navbar>
-                    )}/>
-                    <Route path='/main/account' component={() => (
-                        <Navbar>
-                            <Account/>
-                        </Navbar>
-                    )}/>
-                    <Route path='/main/game' component={() => (
-                        <Game>
-                            <PvPGame/>
-                            <GameChat/>
-                        </Game>
-                    )}/>    
-                </Switch>
+                <Navbar>
+                    <Lobby>
+                        <Matchmaker/>
+                        <LobbyChat/>
+                    </Lobby>
+                </Navbar>
             </Main>
         )}/>
+        <Route path='/main/stats' component={() => (
+            <Main>
+                <Navbar>
+                    <Stats/>
+                </Navbar>
+            </Main>
+        )}/>
+        <Route path='/main/account' component={() => (
+            <Main>
+                <Navbar>
+                    <Account/>
+                </Navbar>
+            </Main>
+        )}/>
+        <Route path='/main/game' component={() => (
+            <Main>
+                <Game>
+                    <PvPGame/>
+                    <GameChat/>
+                </Game>
+            </Main>
+        )}/>    
+            
+        
     </Switch>
 )

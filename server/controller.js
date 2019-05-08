@@ -21,14 +21,18 @@ module.exports = {
 
         const salt = bcrypt.genSaltSync(10)
         const hash = bcrypt.hashSync(password, salt)
-        let id = await db.registerUser({username, hash, firstname, lastname, email})
+        try{
+            let id = await db.registerUser({username, hash, firstname, lastname, email})
 
-        session.user = {
-            username,
-            hash,
-            id: id[0].id
+            session.user = {
+                username,
+                hash,
+                id: id[0].id
+            }
+            res.sendStatus(200)
+        }catch(err){
+            res.sendStatus(500)
         }
-        res.sendStatus(200)
     },
 
     login: async (req, res) => {
@@ -67,9 +71,52 @@ module.exports = {
         }
     },
 
-    updateAccountInfo: async (req, res) => {
+    updateAccountUsername: async(req, res) => {
         const db = req.app.get('db')
         const {session} = req
+        const {username} = req.body
+        const {id} = session.user
+
+        if(!username){
+            return res.sendStatus(400)
+        }
+
+        let usernameTaken = await db.checkUsername({username})
+        usernameTaken = + usernameTaken[0].count
+        if(usernameTaken !== 0){
+            return res.sendStatus(409)
+        }
+
+        try{
+            await db.updateUserUsername({username, id})
+            res.sendStatus(200)
+        }catch(err){
+            res.sendStatus(500)
+        }
+    },
+
+    updateAccountEmail: async (req, res) => {
+        const db = req.app.get('db')
+        const {session} = req
+        const {email} = req.body
+        const {id} = session.user
+
+        if(!email){
+            return res.sendStatus(400)
+        }
+
+        let emailTaken = await db.checkEmail({email})
+        emailTaken = + emailTaken[0].count
+        if(emailTaken !==0){
+            return res.sendStatus(409)
+        }
+
+        try{
+            await db.updateUserEmail({email, id})
+            res.sendStatus(200)
+        }catch(err){
+            res.sendStatus(500)
+        }
     },
 
     getStats: async (req, res) => {
@@ -79,6 +126,19 @@ module.exports = {
             const {id} = session.user
             const stats = await db.getUserStats({id})
             res.send(stats[0])
+        }catch(err){
+            res.sendStatus(500)
+        }
+    },
+
+    deleteUser: async (req, res) => {
+        const db = req.app.get('db')
+        const {session} = req
+        const {id} = session.user
+        try{
+            await db.deleteUser({id})
+            req.session.destroy()
+            res.sendStatus(200)
         }catch(err){
             res.sendStatus(500)
         }

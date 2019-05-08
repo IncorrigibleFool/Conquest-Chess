@@ -29,11 +29,12 @@ export default class Stats extends Component{
             <>
                 <h3>Stats</h3>
                 <Pie
-                    data={{datasets: [{
-                                data: [wins, losses, draws],
-                                backgroundColor: ['blue', 'red', 'yellow']
-                            }], 
-                            labels: ['Wins', 'Losses', 'Draws']}}
+                    data={{
+                        datasets: [{
+                            data: [wins, losses, draws],
+                            backgroundColor: ['blue', 'red', 'yellow']
+                        }], 
+                        labels: ['Wins', 'Losses', 'Draws']}}
                 />
                 <h4>Wins: {wins}</h4>
                 <h4>Losses: {losses}</h4>

@@ -39,8 +39,12 @@ massive(CONNECTION_STRING).then(dbInstance => {
 })
 
 //endpoints
-app.post('/auth/register', ctrl.register)
-app.post('/auth/login', ctrl.login)
-app.delete('/auth/logout', ctrl.logout)
 app.get('/api/info', ctrl.getAccountInfo)
 app.get('/api/stats', ctrl.getStats)
+app.post('/auth/register', ctrl.register)
+app.post('/auth/login', ctrl.login)
+app.put('/auth/info/username', ctrl.updateAccountUsername)
+app.put('/auth/info/email', ctrl.updateAccountEmail)
+//app.put('/auth/info/password, ctrl.updateAccountPassword)
+app.delete('/auth/logout', ctrl.logout)
+app.delete('/auth/delete', ctrl.deleteUser)

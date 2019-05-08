@@ -83,7 +83,7 @@ export default class RegisterForm extends Component {
                     value={this.state.password}
                     onChange={this.handleUpdate}
                 />
-                <button>Register</button>
+                <button>Submit</button>
             </form>
             {this.state.registrationError && <h3>Error in registration. Please try again.</h3>}
             <Link to='/login'>
