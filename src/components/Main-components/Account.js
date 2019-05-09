@@ -1,8 +1,9 @@
 import React, {Component} from 'react'
 import {Redirect, Link} from 'react-router-dom'
 import axios from 'axios'
+import {connect} from 'react-redux';
 
-export default class Account extends Component{
+export class Account extends Component{
     constructor(){
         super()
         this.state = {
@@ -177,3 +178,10 @@ export default class Account extends Component{
         )
     }
 }
+
+const mapStateToProps = (reduxState) => {
+    const {authenticated, id, username, firstname, lastname, email} = reduxState
+    return {authenticated, id, username, firstname, lastname, email}
+}
+
+export default connect(mapStateToProps)(Account)

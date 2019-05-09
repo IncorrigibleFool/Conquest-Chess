@@ -4,9 +4,12 @@ const massive = require('massive')
 const session = require('express-session')
 const app = express()
 const ctrl = require('./controller')
-const io = require('socket.io')()
+const socketIo = require('socket.io')
 
-const {SERVER_PORT, SOCKET_PORT, SESSION_SECRET, CONNECTION_STRING} = process.env
+const {SERVER_PORT, SESSION_SECRET, CONNECTION_STRING} = process.env
+
+
+//server's value is set in database
 
 //middleware
 app.use(express.json())
@@ -19,24 +22,32 @@ app.use(session({
     }
 }))
 
-//socket
-io.on('connection', (socket) => {
-    console.log('new connection')
-
-    socket.on('message', (msg) => {
-        console.log('got message: ' + msg)
-    })
-})
-
 //database
 massive(CONNECTION_STRING).then(dbInstance => {
     app.set('db', dbInstance)
     console.log('Database connected.')
     console.log(`Tables accessible: `, dbInstance.listTables())
-    app.listen(SERVER_PORT, () => {
-        console.log(`Listening on port: ${SERVER_PORT}.`)
+})
+
+const server = app.listen(SERVER_PORT, () => {
+    console.log(`Listening on port: ${SERVER_PORT}.`)
+})
+
+const io = socketIo(server)
+
+//socket
+io.on('connection', socket => {
+    console.log('New client connection.')
+
+    socket.on('disconnect', socket => {
+        console.log('Client disconnected.')
+    })
+    
+    socket.on('message', msg => {
+        console.log('got message: ' + msg)
     })
 })
+
 
 //endpoints
 app.get('/api/info', ctrl.getAccountInfo)

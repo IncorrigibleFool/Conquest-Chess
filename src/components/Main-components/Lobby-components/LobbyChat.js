@@ -1,7 +1,19 @@
-import React from 'react'
+import React, {Component} from 'react'
+import io from 'socket.io-client'
 
-export default function LobbyChat(){
-    return(
-        <h4>Lobby Chat</h4>
-    )
+export default class LobbyChat extends Component{
+    constructor(){
+        super()
+
+        this.socket = io.connect()
+    }
+
+    render(){
+        return(
+            <>
+                <h4>Lobby Chat</h4>
+            </>
+        )
+    }
+    
 }

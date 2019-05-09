@@ -20,6 +20,7 @@ export default App;
 /*
 installed: 
 socket.io
+socket.io-client
 axios
 massive
 react-router-dom

@@ -1,8 +1,10 @@
 import React, {Component} from 'react'
 import axios from 'axios'
 import {Redirect, Link} from 'react-router-dom'
+import {connect} from 'react-redux';
+import{authenticate, updateId, updateUsername, updateName, updateStats, updateEmail} from '../redux/reducer'
 
-export default class LoginForm extends Component{
+export class LoginForm extends Component{
     constructor(){
         super()
         this.state = {
@@ -25,7 +27,22 @@ export default class LoginForm extends Component{
         event.preventDefault()
         const {username, password} = this.state
         try{
-            const response = await axios.post('/auth/login', {username, password})
+            const login = await axios.post('/auth/login', {username, password})
+            const userInfo = await axios.get('/api/info')
+            const userStats = await axios.get('/api/stats')
+            
+            const {authenticated, id} = login.data
+            this.props.authenticate(authenticated)
+            this.props.updateId(id)
+            this.props.updateUsername(username)
+
+            const {firstname, lastname, email} = userInfo.data
+            this.props.updateName({firstname, lastname})
+            this.props.updateEmail(email)
+
+            const {wins, losses, draws, points} = userStats.data
+            this.props.updateStats({wins, losses, draws, points})
+            
             this.setState({
                 loginSuccess: true
             })
@@ -69,3 +86,14 @@ export default class LoginForm extends Component{
     }
     
 }
+
+const mapDispatchToProps = {
+    authenticate,
+    updateId,
+    updateUsername,
+    updateName,
+    updateEmail,
+    updateStats
+}
+
+export default connect(null, mapDispatchToProps)(LoginForm)
