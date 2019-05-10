@@ -1,8 +1,10 @@
 import React, {Component} from 'react'
 import axios from 'axios';
 import {Redirect, Link} from 'react-router-dom'
+import {authenticate, updateId, updateUsername, updateName, updateStats, updateEmail} from '../redux/reducer'
+import {connect} from 'react-redux'
 
-export default class RegisterForm extends Component {
+export class RegisterForm extends Component {
     constructor(){
         super()
         this.state = {
@@ -28,7 +30,19 @@ export default class RegisterForm extends Component {
         event.preventDefault()
         const {username, password, firstname, lastname, email} = this.state
         try{
-            const response = await axios.post('/auth/register', {username, password, firstname, lastname, email}) 
+            const login = await axios.post('/auth/register', {username, password, firstname, lastname, email})
+            const userStats = await axios.get('/api/stats')
+
+            const{authenticated, id} = login.data
+            this.props.authenticate(authenticated)
+            this.props.updateId(id)
+            this.props.updateUsername(username)
+            this.props.updateName({firstname, lastname})
+            this.props.updateEmail(email)
+
+            const{wins, losses, draws, points} = userStats.data
+            this.props.updateStats({wins, losses, draws, points})
+
             this.setState({
                 registrationSuccess: true
             })
@@ -93,3 +107,14 @@ export default class RegisterForm extends Component {
         )
     }
 }
+
+const mapDispatchToProps = {
+    authenticate,
+    updateId,
+    updateUsername,
+    updateName,
+    updateEmail,
+    updateStats
+}
+
+export default connect(null, mapDispatchToProps)(RegisterForm)

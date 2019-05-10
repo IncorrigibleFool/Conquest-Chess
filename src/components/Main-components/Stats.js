@@ -1,22 +1,33 @@
 import React, {Component} from 'react'
 import {Link} from 'react-router-dom'
-//import axios from 'axios'
 import {Pie} from 'react-chartjs-2'
-import {connect} from 'react-redux';
+import {connect} from 'react-redux'
 
 export class Stats extends Component{
-    
-    // componentDidMount(){
-    //     axios.get('/api/stats').then(res => {
-    //         const {wins, losses, draws, points} = res.data
-    //         this.setState({
-    //             wins, losses, draws, points
-    //         })
-    //     })
-    // }
-    
+    constructor(){
+        super()
+        this.state = {
+            wins: null,
+            losses: null,
+            draws: null,
+            points: null,
+        }
+    }
+
+    async componentDidMount(){
+        await setTimeout(() => {
+            const {wins, losses, draws, points} = this.props
+            this.setState({
+                wins,
+                losses,
+                draws,
+                points
+            })
+        }, 200)
+    }
+
     render(){
-        const {wins, losses, draws, points} = this.props
+        const {wins, losses, draws, points} = this.state
         
         if(wins === 0 && losses === 0 && draws ===0){
             return(
@@ -39,6 +50,7 @@ export class Stats extends Component{
                             backgroundColor: ['blue', 'red', 'yellow']
                         }], 
                         labels: ['Wins', 'Losses', 'Draws']}}
+                    //options={{animation: {duration: 5000}}}
                 />
                 <h4>Wins: {wins}</h4>
                 <h4>Losses: {losses}</h4>

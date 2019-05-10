@@ -42,10 +42,11 @@ export class LoginForm extends Component{
 
             const {wins, losses, draws, points} = userStats.data
             this.props.updateStats({wins, losses, draws, points})
-            
+
             this.setState({
                 loginSuccess: true
             })
+            
         }catch(err){
             this.setState({
                 username: '',

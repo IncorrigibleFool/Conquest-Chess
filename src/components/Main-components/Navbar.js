@@ -1,8 +1,10 @@
 import React, {Component} from 'react'
 import axios from 'axios'
 import {Redirect, Link} from 'react-router-dom'
+import {connect} from 'react-redux'
+import {authenticate, updateId, updateUsername, updateName, updateStats, updateEmail} from '../../redux/reducer'
 
-export default class Navbar extends Component{
+export class Navbar extends Component{
     constructor(){
         super()
         this.state ={
@@ -14,9 +16,18 @@ export default class Navbar extends Component{
     logout = async () => {
         try{
             await axios.delete('/auth/logout')
+            
             this.setState({
                 logout: true
             })
+
+            this.props.authenticate(false)
+            this.props.updateId(null)
+            this.props.updateUsername('')
+            this.props.updateName({firstname: '', lastname: ''})
+            this.props.updateStats({wins: null, losses: null, draws: null, points: null})
+            this.props.updateEmail('')
+            
         }catch(err){
             this.setState({
                 logoutError: true
@@ -45,3 +56,14 @@ export default class Navbar extends Component{
         )
     }
 }
+
+const mapDispatchToProps = {
+    authenticate,
+    updateId,
+    updateUsername,
+    updateName,
+    updateStats,
+    updateEmail
+}
+
+export default connect(null, mapDispatchToProps)(Navbar)

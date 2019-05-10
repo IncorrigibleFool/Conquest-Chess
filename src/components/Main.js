@@ -1,12 +1,33 @@
 import React, {Component} from 'react'
+import {connect} from 'react-redux'
+import Unauthorized from './Main-components/Unauthorized'
 
-export default class Main extends Component{
+export class Main extends Component{
+    constructor(props){
+        super(props)
+    }
+    
     render(){
+        if(!this.props.authenticated){
+            return(
+                <>
+                    <Unauthorized/>
+                </>
+            )
+        }
+        
         return(
-            <div>
+            <>
                 <h1>Main</h1>
                 {this.props.children}
-            </div>
+            </>
         )
     }
 }
+
+const mapStateToProps = (reduxState) => {
+    const{authenticated} = reduxState
+    return{authenticated}
+}
+
+export default connect(mapStateToProps)(Main)

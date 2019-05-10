@@ -180,8 +180,8 @@ export class Account extends Component{
 }
 
 const mapStateToProps = (reduxState) => {
-    const {authenticated, id, username, firstname, lastname, email} = reduxState
-    return {authenticated, id, username, firstname, lastname, email}
+    const {id, username, firstname, lastname, email} = reduxState
+    return {id, username, firstname, lastname, email}
 }
 
 export default connect(mapStateToProps)(Account)

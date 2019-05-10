@@ -65,7 +65,5 @@ export default (
                 </Game>
             </Main>
         )}/>    
-            
-        
     </Switch>
 )

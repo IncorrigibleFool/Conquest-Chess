@@ -23,13 +23,14 @@ module.exports = {
         const hash = bcrypt.hashSync(password, salt)
         try{
             let id = await db.registerUser({username, hash, firstname, lastname, email})
+            const authenticated = true
 
             session.user = {
                 username,
                 hash,
                 id: id[0].id
             }
-            res.sendStatus(200)
+            res.send({authenticated, id: id[0].id})
         }catch(err){
             res.sendStatus(500)
         }
