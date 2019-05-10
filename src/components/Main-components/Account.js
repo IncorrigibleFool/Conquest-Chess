@@ -126,7 +126,7 @@ export class Account extends Component{
         }
         
         const {username, firstname, lastname, email, editedUsername, editedEmail} = this.state
-        const {confirm, editMode, updateError, deleteError} = this.state
+        const {confirm, editMode, deleteError} = this.state
 
         return(
             <>

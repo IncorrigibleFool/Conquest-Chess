@@ -8,9 +8,6 @@ const socketIo = require('socket.io')
 
 const {SERVER_PORT, SESSION_SECRET, CONNECTION_STRING} = process.env
 
-
-//server's value is set in database
-
 //middleware
 app.use(express.json())
 app.use(session({
@@ -39,12 +36,17 @@ const io = socketIo(server)
 io.on('connection', socket => {
     console.log('New client connection.')
 
-    socket.on('disconnect', socket => {
+    socket.on('disconnect', () => {
         console.log('Client disconnected.')
     })
     
-    socket.on('message', msg => {
-        console.log('got message: ' + msg)
+    socket.on('blast to lobby', data => {
+        io.sockets.emit('lobby', data)
+    })
+
+    socket.on('move', data => {
+        console.log('New movement')
+        socket.broadcast.emit('move', data)
     })
 })
 

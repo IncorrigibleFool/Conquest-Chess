@@ -3,10 +3,7 @@ import {connect} from 'react-redux'
 import Unauthorized from './Main-components/Unauthorized'
 
 export class Main extends Component{
-    constructor(props){
-        super(props)
-    }
-    
+
     render(){
         if(!this.props.authenticated){
             return(

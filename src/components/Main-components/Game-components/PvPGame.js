@@ -2,11 +2,14 @@ import React, {Component} from 'react'
 import PropTypes from "prop-types";
 import Chess from "chess.js"
 import Chessboard from 'chessboardjsx'
+import io from 'socket.io-client'
 
 class HumanVsHuman extends Component{
     static propTypes = { children: PropTypes.func };
 
-    state = {
+    constructor(){
+      super()
+      this.state = {
         fen: "start",
         // square styles for active drop square
         dropSquareStyle: {},
@@ -18,7 +21,17 @@ class HumanVsHuman extends Component{
         square: "",
         // array of past game moves
         history: []
-    };
+      };
+      this.socket = io.connect()
+      this.socket.on('move', data => {
+        this.game.move(data)
+        this.setState(({ history, pieceSquare }) => ({
+          fen: this.game.fen(),
+          history: this.game.history({ verbose: true }),
+          squareStyles: squareStyling({ pieceSquare, history })
+        }));
+      })
+    }
 
   componentDidMount() {
     this.game = new Chess();
@@ -63,16 +76,20 @@ class HumanVsHuman extends Component{
     let move = this.game.move({
       from: sourceSquare,
       to: targetSquare,
-      promotion: "q" // always promote to a queen for example simplicity
+      promotion: "q" // always promote to a queen for simplicity
     });
 
     // illegal move
     if (move === null) return;
+
     this.setState(({ history, pieceSquare }) => ({
       fen: this.game.fen(),
       history: this.game.history({ verbose: true }),
       squareStyles: squareStyling({ pieceSquare, history })
     }));
+
+    //broadcast move
+    this.broadcastMove(move)
   };
 
   onMouseOverSquare = square => {
@@ -122,6 +139,9 @@ class HumanVsHuman extends Component{
       history: this.game.history({ verbose: true }),
       pieceSquare: ""
     });
+
+    //broadcast move
+    this.broadcastMove(move)
   };
 
   //undoes left clicking a square (onSquareClick function)
@@ -130,6 +150,12 @@ class HumanVsHuman extends Component{
       squareStyles: { [square]: { backgroundColor: "" } },
       pieceSquare: ""
     });
+
+  //*socket.io functions below*
+  //movement broadcast
+  broadcastMove = (move) => {
+    this.socket.emit('move', move)
+  }
 
   render() {
     const { fen, dropSquareStyle, squareStyles } = this.state;
