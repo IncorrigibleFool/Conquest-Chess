@@ -1,5 +1,7 @@
 const bcrypt = require('bcryptjs')
 
+var rooms = []
+
 module.exports = {
     register: async (req, res) => {
         const db = req.app.get('db')
@@ -140,6 +142,24 @@ module.exports = {
             await db.deleteUser({id})
             req.session.destroy()
             res.sendStatus(200)
+        }catch(err){
+            res.sendStatus(500)
+        }
+    },
+
+    getRooms: (req, res) => {
+        try{
+            res.send(rooms)
+        }catch(err){
+            res.sendStatus(500)
+        }
+    },
+
+    updateRooms: (req, res) => {
+        const {room} = req.body
+        rooms.push(room)
+        try{
+            res.send(rooms)
         }catch(err){
             res.sendStatus(500)
         }

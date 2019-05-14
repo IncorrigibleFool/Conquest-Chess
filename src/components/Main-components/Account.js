@@ -2,15 +2,12 @@ import React, {Component} from 'react'
 import {Redirect, Link} from 'react-router-dom'
 import axios from 'axios'
 import {connect} from 'react-redux';
+import {updateUsername, updateEmail} from '../../redux/reducer'
 
 export class Account extends Component{
     constructor(){
         super()
         this.state = {
-            username: '',
-            firstname: '',
-            lastname: '',
-            email: '',
             editedUsername: '',
             editedEmail: '',
             confirm: false,
@@ -19,23 +16,6 @@ export class Account extends Component{
             updateError: false,
             deleteError: false
         }
-    }
-
-    componentDidMount(){
-        axios.get('/api/info').then(res => {
-            const {username, firstname, lastname, email} = res.data
-            
-            this.setState({
-                username,
-                firstname,
-                lastname,
-                email,
-                editedUsername: username,
-                editedFirstname: firstname,
-                editedLastname: lastname,
-                editedEmail: email
-            })
-        })
     }
 
     handleUpdate = (event) => {
@@ -54,10 +34,8 @@ export class Account extends Component{
 
     cancelUpdate = () => {
         this.setState({
-            editedUsername: this.state.username,
-            editedFirstname: this.state.firstname,
-            editedLastname: this.state.lastname,
-            editedEmail: this.state.email,
+            editedUsername: '',
+            editedEmail: '',
             editMode: false
         })
     }
@@ -67,8 +45,9 @@ export class Account extends Component{
         const {editedUsername : username} = this.state
         try{
             await axios.put('/auth/info/username', {username})
+            this.props.updateUsername(username)
             this.setState({
-                username
+                editedUsername: ''
             })
         }catch(err){
             this.setState({
@@ -82,8 +61,9 @@ export class Account extends Component{
         const {editedEmail : email} = this.state
         try{
             await axios.put('/auth/info/email', {email})
+            this.props.updateEmail(email)
             this.setState({
-                email
+                editedEmail: ''
             })
         }catch(err){
             this.setState({
@@ -125,7 +105,8 @@ export class Account extends Component{
             return(<Redirect to='/login'/>)
         }
         
-        const {username, firstname, lastname, email, editedUsername, editedEmail} = this.state
+        const {username, firstname, lastname, email} = this.props
+        const {editedUsername, editedEmail} = this.state
         const {confirm, editMode, deleteError} = this.state
 
         return(
@@ -184,4 +165,9 @@ const mapStateToProps = (reduxState) => {
     return {id, username, firstname, lastname, email}
 }
 
-export default connect(mapStateToProps)(Account)
+const mapDispatchToProps = {
+    updateUsername,
+    updateEmail
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Account)

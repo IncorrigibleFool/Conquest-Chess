@@ -36,17 +36,22 @@ const io = socketIo(server)
 io.on('connection', socket => {
     console.log('New client connection.')
 
-    socket.on('disconnect', () => {
-        console.log('Client disconnected.')
-    })
-    
+    //lobby
     socket.on('blast to lobby', data => {
         io.sockets.emit('lobby', data)
     })
 
+    socket.on('new room', data => {
+        io.sockets.emit('new room', data)
+    })
+
+    //rooms
+    socket.on('join room', data => {
+        socket.join(data.room)
+    })
+
     socket.on('move', data => {
-        console.log('New movement')
-        socket.broadcast.emit('move', data)
+        socket.to(data.room).emit('move', data)
     })
 })
 
@@ -61,3 +66,5 @@ app.put('/auth/info/email', ctrl.updateAccountEmail)
 //app.put('/auth/info/password, ctrl.updateAccountPassword)
 app.delete('/auth/logout', ctrl.logout)
 app.delete('/auth/delete', ctrl.deleteUser)
+app.get('/api/rooms', ctrl.getRooms)
+app.put('/api/rooms', ctrl.updateRooms)

@@ -7,8 +7,8 @@ import io from 'socket.io-client'
 class HumanVsHuman extends Component{
     static propTypes = { children: PropTypes.func };
 
-    constructor(){
-      super()
+    constructor(props){
+      super(props)
       this.state = {
         fen: "start",
         // square styles for active drop square
@@ -24,7 +24,7 @@ class HumanVsHuman extends Component{
       };
       this.socket = io.connect()
       this.socket.on('move', data => {
-        this.game.move(data)
+        this.game.move(data.move)
         this.setState(({ history, pieceSquare }) => ({
           fen: this.game.fen(),
           history: this.game.history({ verbose: true }),
@@ -35,6 +35,7 @@ class HumanVsHuman extends Component{
 
   componentDidMount() {
     this.game = new Chess();
+    this.socket.emit('join room', {room: this.props.room})
   }
 
   // keep clicked square style and remove hint squares
@@ -88,7 +89,7 @@ class HumanVsHuman extends Component{
       squareStyles: squareStyling({ pieceSquare, history })
     }));
 
-    //broadcast move
+    //broadcast move to socket
     this.broadcastMove(move)
   };
 
@@ -151,10 +152,9 @@ class HumanVsHuman extends Component{
       pieceSquare: ""
     });
 
-  //*socket.io functions below*
-  //movement broadcast
+  //broadcast function
   broadcastMove = (move) => {
-    this.socket.emit('move', move)
+    this.socket.emit('move', {move, room: this.props.room})
   }
 
   render() {
@@ -193,10 +193,12 @@ const squareStyling = ({ pieceSquare, history }) => {
     };
   };
 
-export default function PvPGame() {
+export default function PvPGame(props) {
   return (
     <div>
-      <HumanVsHuman>
+      <HumanVsHuman
+        room={`${props.match.params.room}`}
+      >
         {({
           position,
           onDrop,

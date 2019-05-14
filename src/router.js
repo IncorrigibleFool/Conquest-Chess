@@ -57,11 +57,11 @@ export default (
                 </Navbar>
             </Main>
         )}/>
-        <Route path='/main/game' component={() => (
+        <Route path='/main/game/:room' render={(props) => (
             <Main>
-                <Game>
-                    <PvPGame/>
-                    <GameChat/>
+                <Game {...props}>
+                    <PvPGame {...props}/>
+                    <GameChat {...props}/>
                 </Game>
             </Main>
         )}/>    

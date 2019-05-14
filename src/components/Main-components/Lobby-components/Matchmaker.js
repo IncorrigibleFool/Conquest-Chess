@@ -1,24 +1,35 @@
 import React, {Component} from 'react'
 import {Link} from 'react-router-dom'
-import {connect} from 'react-redux'
-import {} from '../../../redux/reducer'
+import axios from 'axios'
+import io from 'socket.io-client'
 
-export class Matchmaker extends Component{
+export default class Matchmaker extends Component{
     constructor(){
         super()
         this.state = {
             rooms: [],
             roomName: ''
         }
+        this.socket = io.connect()
+        this.socket.on('new room', data => {
+            this.setState({
+                rooms: [...this.state.rooms, data.room]
+            })
+        })
+    }
+
+    async componentDidMount(){
+        const res = await axios.get('/api/rooms')
+        this.setState({
+            rooms: res.data
+        })
     }
 
     newRoom = () => {
-        const roomsArr = this.state.rooms.slice()
-        roomsArr.push(this.state.roomName)
-        this.setState({
-            roomName: '',
-            rooms: roomsArr
-        })
+        const {roomName : room} = this.state
+        axios.put('/api/rooms', {room}).then(() => {
+            this.socket.emit('new room', {room})
+        }).catch(err => console.log(err))
     }
 
     handleInput = (event) => {
@@ -30,25 +41,28 @@ export class Matchmaker extends Component{
     render(){
         const rooms = this.state.rooms.map((room, i) =>(
             <div key={i}>
-                <h3>{room.roomName}</h3>
-                <button>Enter</button>
+                <h3>{room}</h3>
+                <Link to ={{pathname:`/main/game/${room}`, state: {room}}}>
+                    <button>Enter</button>
+                </Link>
             </div>
         ))
         return(
             <>
                 <h4>Matchmaker</h4>
                 {rooms}
-                <Link to='/main/game'>
-                    <button>Game</button>
-                </Link>
+                <input
+                    onChange={this.handleInput}
+                    name='roomName'
+                    value={this.state.roomName}
+                />
+                <select>
+                    <option value='white'>White</option>
+                    <option value='black'>Black</option>
+                </select>
+                <button onClick={this.newRoom}>Make Room</button>
             </>
         )
     }
     
 }
-
-const mapDispatchToProps ={
-
-}
-
-export default connect(null, mapDispatchToProps)(Matchmaker)
