@@ -37,17 +37,25 @@ io.on('connection', socket => {
     console.log('New client connection.')
 
     //lobby
-    socket.on('blast to lobby', data => {
-        io.sockets.emit('lobby', data)
+    socket.on('lobby message', data => {
+        io.sockets.emit('lobby message', data)
     })
 
     socket.on('new room', data => {
         io.sockets.emit('new room', data)
     })
 
+    socket.on('new player', data => {
+        io.sockets.emit('new player', data)
+    })
+
     //rooms
     socket.on('join room', data => {
         socket.join(data.room)
+    })
+
+    socket.on('room message', data => {
+        io.in(data.room).emit('room message', data)
     })
 
     socket.on('move', data => {
@@ -68,3 +76,4 @@ app.delete('/auth/logout', ctrl.logout)
 app.delete('/auth/delete', ctrl.deleteUser)
 app.get('/api/rooms', ctrl.getRooms)
 app.put('/api/rooms', ctrl.updateRooms)
+app.put('/api/rooms/players', ctrl.updatePlayers)

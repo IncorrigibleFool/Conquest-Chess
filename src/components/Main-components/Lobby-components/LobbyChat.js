@@ -10,7 +10,11 @@ export class LobbyChat extends Component{
             message: ''
         }
         this.socket = io.connect()
-        this.socket.on('lobby', data => this.updateMessages(data))
+        this.socket.on('lobby message', data => this.updateMessages(data))
+    }
+
+    componentWillUnmount(){
+        this.socket.disconnect()
     }
 
     handleChange = (event) => {
@@ -21,7 +25,10 @@ export class LobbyChat extends Component{
     }
 
     submitMessage = () => {
-        this.socket.emit('blast to lobby', {username: this.props.username, message: this.state.message})
+        this.socket.emit('lobby message', {username: this.props.username, message: this.state.message})
+        this.setState({
+            message: ''
+        })
     }
 
     updateMessages = (data) => {

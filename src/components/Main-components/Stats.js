@@ -27,7 +27,7 @@ export class Stats extends Component{
     }
 
     render(){
-        const {wins, losses, draws, points} = this.state
+        const {wins, losses, draws} = this.state
         
         if(wins === 0 && losses === 0 && draws ===0){
             return(
@@ -55,7 +55,6 @@ export class Stats extends Component{
                 <h4>Wins: {wins}</h4>
                 <h4>Losses: {losses}</h4>
                 <h4>Draws: {draws}</h4>
-                <h4>Points: {points}</h4>
                 <Link to='/main/lobby'>
                     <button>Back</button>
                 </Link>

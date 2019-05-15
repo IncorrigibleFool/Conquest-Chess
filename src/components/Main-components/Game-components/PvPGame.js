@@ -17,7 +17,7 @@ class HumanVsHuman extends Component{
         stalemate: false,
         lackMaterial: false,
         threefold: false,
-        color: this.props.color,
+        turn: 'w',
         fen: "start",
         // square styles for active drop square
         dropSquareStyle: {},
@@ -40,6 +40,7 @@ class HumanVsHuman extends Component{
           stalemate: this.game.in_stalemate(),
           lackMaterial: this.game.insufficient_material(),
           threefold: this.game.in_threefold_repetition(),
+          turn: this.game.turn(),
           fen: this.game.fen(),
           history: this.game.history({ verbose: true }),
           squareStyles: squareStyling({ pieceSquare, history })
@@ -88,7 +89,7 @@ class HumanVsHuman extends Component{
 
   onDrop = ({ sourceSquare, targetSquare }) => {
     const turn = this.game.turn()
-    if(turn !== this.state.color) return
+    if(turn !== this.props.color) return
     
     // see if the move is legal
     let move = this.game.move({
@@ -101,6 +102,13 @@ class HumanVsHuman extends Component{
     if (move === null) return;
 
     this.setState(({ history, pieceSquare }) => ({
+      checkmate: this.game.in_checkmate(),
+      check: this.game.in_check(),
+      draw: this.game.in_draw(),
+      stalemate: this.game.in_stalemate(),
+      lackMaterial: this.game.insufficient_material(),
+      threefold: this.game.in_threefold_repetition(),
+      turn: this.game.turn(),
       fen: this.game.fen(),
       history: this.game.history({ verbose: true }),
       squareStyles: squareStyling({ pieceSquare, history })
@@ -112,7 +120,7 @@ class HumanVsHuman extends Component{
 
   onMouseOverSquare = square => {
     const turn = this.game.turn()
-    if(turn !== this.state.color) return
+    if(turn !== this.props.color) return
 
     // get list of possible moves for this square
     let moves = this.game.moves({
@@ -142,7 +150,7 @@ class HumanVsHuman extends Component{
 
   onSquareClick = square => {
     const turn = this.game.turn()
-    if(turn !== this.state.color) return
+    if(turn !== this.props.color) return
     
     this.setState(({ history }) => ({
       squareStyles: squareStyling({ pieceSquare: square, history }),
@@ -159,6 +167,13 @@ class HumanVsHuman extends Component{
     if (move === null) return;
 
     this.setState({
+      checkmate: this.game.in_checkmate(),
+      check: this.game.in_check(),
+      draw: this.game.in_draw(),
+      stalemate: this.game.in_stalemate(),
+      lackMaterial: this.game.insufficient_material(),
+      threefold: this.game.in_threefold_repetition(),
+      turn: this.game.turn(),
       fen: this.game.fen(),
       history: this.game.history({ verbose: true }),
       pieceSquare: ""
@@ -169,14 +184,13 @@ class HumanVsHuman extends Component{
   };
 
   //undoes left clicking a square (onSquareClick function)
-  onSquareRightClick = square =>
+  onSquareRightClick = square => {
     this.setState(({history}) =>({
-      squareStyles: squareStyling({ pieceSquare: square, history}),
+      squareStyles: squareStyling({ square, history}),
       //squareStyles: { [square]: { backgroundColor: "deepPink" } },
       pieceSquare: ""
     }))
-      
-    
+  }
 
   //broadcast function
   broadcastMove = (move) => {
@@ -184,7 +198,8 @@ class HumanVsHuman extends Component{
   }
 
   render() {
-    const { fen, dropSquareStyle, squareStyles } = this.state;
+    const { fen, dropSquareStyle, squareStyles, checkmate, check, draw, stalemate, lackMaterial, threefold, turn} = this.state;
+    const {room} = this.props
 
     return this.props.children({
       squareStyles,
@@ -195,7 +210,16 @@ class HumanVsHuman extends Component{
       dropSquareStyle,
       onDragOverSquare: this.onDragOverSquare,
       onSquareClick: this.onSquareClick,
-      onSquareRightClick: this.onSquareRightClick
+      onSquareRightClick: this.onSquareRightClick,
+      //GameChat props
+      room,
+      checkmate,
+      check,
+      draw,
+      stalemate,
+      lackMaterial,
+      threefold,
+      turn
     });
   }
 }
@@ -205,15 +229,15 @@ const squareStyling = ({ pieceSquare, history }) => {
     const targetSquare = history.length && history[history.length - 1].to;
   
     return {
-      [pieceSquare]: { backgroundColor: "rgba(63, 155, 191, 0.6)" },
+      [pieceSquare]: { backgroundColor: "rgba(63, 155, 191, 1)" },
       ...(history.length && {
         [sourceSquare]: {
-          backgroundColor: "rgba(255, 255, 0, 0.5)"
+          backgroundColor: "rgba(255, 255, 0, 0.4)"
         }
       }),
       ...(history.length && {
         [targetSquare]: {
-          backgroundColor: "rgba(255, 255, 0, 0.5)"
+          backgroundColor: "rgba(255, 255, 0, 0.4)"
         }
       })
     };
@@ -235,7 +259,15 @@ export default function PvPGame(props) {
           dropSquareStyle,
           onDragOverSquare,
           onSquareClick,
-          onSquareRightClick
+          onSquareRightClick,
+          room,
+          checkmate,
+          check,
+          draw,
+          stalemate,
+          lackMaterial,
+          threefold,
+          turn
         }) => (
           <>
             <Chessboard
@@ -255,7 +287,17 @@ export default function PvPGame(props) {
               onSquareClick={onSquareClick}
               onSquareRightClick={onSquareRightClick}
             />
-            <GameChat/>
+            <GameChat
+              id="gameChat"
+              room={room}
+              checkmate={checkmate}
+              check={check}
+              draw={draw}
+              stalemate={stalemate}
+              lackMaterial={lackMaterial}
+              threefold={threefold}
+              turn={turn}
+            />
           </>
         )}
       </HumanVsHuman>

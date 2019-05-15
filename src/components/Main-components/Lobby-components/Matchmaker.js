@@ -2,8 +2,9 @@ import React, {Component} from 'react'
 import {Link} from 'react-router-dom'
 import axios from 'axios'
 import io from 'socket.io-client'
+import {connect} from 'react-redux'
 
-export default class Matchmaker extends Component{
+export class Matchmaker extends Component{
     constructor(){
         super()
         this.state = {
@@ -18,6 +19,13 @@ export default class Matchmaker extends Component{
                 rooms: [...this.state.rooms, data]
             })
         })
+        this.socket.on('new player', data => {
+            var tempArr = this.state.rooms
+            tempArr[data.index].players.push(data.username)
+            this.setState({
+                rooms: tempArr
+            })
+        })
     }
 
     async componentDidMount(){
@@ -29,8 +37,18 @@ export default class Matchmaker extends Component{
 
     newRoom = () => {
         const {roomName : name, color} = this.state
-        axios.put('/api/rooms', {name, color}).then(() => {
-            this.socket.emit('new room', {name, color})
+        const {username} = this.props
+        axios.put('/api/rooms', {name, color, players: [username]}).then(() => {
+            this.socket.emit('new room', {name, color, players: [username]})
+            this.socket.disconnect()
+        }).catch(err => console.log(err))
+        
+    }
+
+    enterRoom = (index) => {
+        const {username} = this.props
+        axios.put('/api/rooms/players', {username, index}).then(() => {
+            this.socket.emit('new player', {username, index})
         }).catch(err => console.log(err))
     }
 
@@ -56,16 +74,36 @@ export default class Matchmaker extends Component{
     }
     
     render(){
-        //add key players to room, if players = 2 render "game in progress" with a watch button
-        //also add key username to render 'user1 vs user2'
-        const rooms = this.state.rooms.map((room, i) =>(
-            <div key={i}>
-                <h3>{room.name}</h3>
-                <Link to ={{pathname:`/main/game/${room.name}`, state: {color: room.color}}}>
-                    <button>Enter</button>
-                </Link>
-            </div>
-        ))
+        const rooms = this.state.rooms.map((room, i) => {
+            var color = ''
+            var challengerColor = ''
+            if(room.color === 'b'){
+                color = 'White'
+                challengerColor = 'Black'
+            }
+            if(room.color === 'w'){
+                color = 'Black'
+                challengerColor = 'White'
+            }
+            if(room.players.length >= 2)return(
+                <div key={i}>
+                    <h3>{room.name}</h3>
+                    <h4>{`${room.players[0]} (${color}) vs ${room.players[1]} (${challengerColor})`}</h4>
+                    <Link to={{pathname: `/main/game/${room.name}`, state: {color: null}}}>
+                        <button>Watch</button>
+                    </Link>
+                </div>
+            )
+            return(
+                <div key={i}>
+                    <h3>{room.name}</h3>
+                    <h4>{`${room.players[0]} (${color})`} seeking opponent</h4>
+                    <Link to ={{pathname:`/main/game/${room.name}`, state: {color: room.color}}}>
+                        <button onClick={() => this.enterRoom(i)}>Enter</button>
+                    </Link>
+                </div>
+            )
+        })
         return(
             <>
                 <h4>Matchmaker</h4>
@@ -86,5 +124,11 @@ export default class Matchmaker extends Component{
             </>
         )
     }
-    
 }
+
+const mapStateToProps = (reduxState) => {
+    const {username} = reduxState
+    return {username}
+}
+
+export default connect(mapStateToProps)(Matchmaker)

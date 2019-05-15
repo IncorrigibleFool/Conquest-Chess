@@ -156,8 +156,18 @@ module.exports = {
     },
 
     updateRooms: (req, res) => {
-        const {name, color} = req.body
-        rooms.push({name, color})
+        const {name, color, players} = req.body
+        rooms.push({name, color, players})
+        try{
+            res.send(rooms)
+        }catch(err){
+            res.sendStatus(500)
+        }
+    },
+
+    updatePlayers: (req, res) => {
+        const {username, index} = req.body
+        rooms[index].players.push(username)
         try{
             res.send(rooms)
         }catch(err){

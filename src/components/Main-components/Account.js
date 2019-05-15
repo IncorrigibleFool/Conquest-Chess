@@ -2,7 +2,7 @@ import React, {Component} from 'react'
 import {Redirect, Link} from 'react-router-dom'
 import axios from 'axios'
 import {connect} from 'react-redux';
-import {updateUsername, updateEmail} from '../../redux/reducer'
+import {authenticate, updateId, updateUsername, updateName, updateStats, updateEmail} from '../../redux/reducer'
 
 export class Account extends Component{
     constructor(){
@@ -90,6 +90,12 @@ export class Account extends Component{
         })
         try{
             await axios.delete('/auth/delete')
+            this.props.authenticate(false)
+            this.props.updateId(null)
+            this.props.updateUsername('')
+            this.props.updateName({firstname: '', lastname: ''})
+            this.props.updateEmail('')
+            this.props.updateStats({wins: null, losses: null, draws: null, points: null})
             this.setState({
                 deleted: true
         })
@@ -166,6 +172,10 @@ const mapStateToProps = (reduxState) => {
 }
 
 const mapDispatchToProps = {
+    authenticate,
+    updateId,
+    updateName,
+    updateStats,
     updateUsername,
     updateEmail
 }
