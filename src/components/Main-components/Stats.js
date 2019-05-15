@@ -23,7 +23,7 @@ export class Stats extends Component{
                 draws,
                 points
             })
-        }, 200)
+        }, 300)
     }
 
     render(){

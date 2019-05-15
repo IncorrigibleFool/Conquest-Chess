@@ -8,12 +8,14 @@ export default class Matchmaker extends Component{
         super()
         this.state = {
             rooms: [],
-            roomName: ''
+            roomName: '',
+            color: 'b',
+            chosenColor: 'w'
         }
         this.socket = io.connect()
         this.socket.on('new room', data => {
             this.setState({
-                rooms: [...this.state.rooms, data.room]
+                rooms: [...this.state.rooms, data]
             })
         })
     }
@@ -26,9 +28,9 @@ export default class Matchmaker extends Component{
     }
 
     newRoom = () => {
-        const {roomName : room} = this.state
-        axios.put('/api/rooms', {room}).then(() => {
-            this.socket.emit('new room', {room})
+        const {roomName : name, color} = this.state
+        axios.put('/api/rooms', {name, color}).then(() => {
+            this.socket.emit('new room', {name, color})
         }).catch(err => console.log(err))
     }
 
@@ -37,12 +39,29 @@ export default class Matchmaker extends Component{
             [event.target.name]: event.target.value
         })
     }
+
+    handleOption = (event) => {
+        if(event.target.value === 'b'){
+            this.setState({
+                color: 'b',
+                chosenColor: 'w'
+            })
+        }
+        if(event.target.value === 'w'){
+            this.setState({
+                color: 'w',
+                chosenColor: 'b'
+            })
+        }
+    }
     
     render(){
+        //add key players to room, if players = 2 render "game in progress" with a watch button
+        //also add key username to render 'user1 vs user2'
         const rooms = this.state.rooms.map((room, i) =>(
             <div key={i}>
-                <h3>{room}</h3>
-                <Link to ={{pathname:`/main/game/${room}`, state: {room}}}>
+                <h3>{room.name}</h3>
+                <Link to ={{pathname:`/main/game/${room.name}`, state: {color: room.color}}}>
                     <button>Enter</button>
                 </Link>
             </div>
@@ -53,14 +72,17 @@ export default class Matchmaker extends Component{
                 {rooms}
                 <input
                     onChange={this.handleInput}
+                    placeholder='Room name'
                     name='roomName'
                     value={this.state.roomName}
                 />
-                <select>
-                    <option value='white'>White</option>
-                    <option value='black'>Black</option>
+                <select onChange={this.handleOption} name='color' value={this.state.color}>
+                    <option value='b'>White</option>
+                    <option value='w'>Black</option>
                 </select>
-                <button onClick={this.newRoom}>Make Room</button>
+                <Link to={{pathname: `/main/game/${this.state.roomName}`, state:{color: this.state.chosenColor}}}>
+                    <button onClick={this.newRoom}>Make Room</button>
+                </Link>
             </>
         )
     }

@@ -13,7 +13,6 @@ import Stats from './components/Main-components/Stats'
 import Account from './components/Main-components/Account'
 import Game from './components/Main-components/Game'
 import PvPGame from './components/Main-components/Game-components/PvPGame'
-import GameChat from './components/Main-components/Game-components/GameChat'
 
 export default (
     <Switch>
@@ -61,7 +60,6 @@ export default (
             <Main>
                 <Game {...props}>
                     <PvPGame {...props}/>
-                    <GameChat {...props}/>
                 </Game>
             </Main>
         )}/>    

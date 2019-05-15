@@ -156,8 +156,8 @@ module.exports = {
     },
 
     updateRooms: (req, res) => {
-        const {room} = req.body
-        rooms.push(room)
+        const {name, color} = req.body
+        rooms.push({name, color})
         try{
             res.send(rooms)
         }catch(err){

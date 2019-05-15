@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import Chess from "chess.js"
 import Chessboard from 'chessboardjsx'
 import io from 'socket.io-client'
+import GameChat from './GameChat'
 
 class HumanVsHuman extends Component{
     static propTypes = { children: PropTypes.func };
@@ -10,6 +11,13 @@ class HumanVsHuman extends Component{
     constructor(props){
       super(props)
       this.state = {
+        checkmate: false,
+        check: false,
+        draw: false,
+        stalemate: false,
+        lackMaterial: false,
+        threefold: false,
+        color: this.props.color,
         fen: "start",
         // square styles for active drop square
         dropSquareStyle: {},
@@ -26,6 +34,12 @@ class HumanVsHuman extends Component{
       this.socket.on('move', data => {
         this.game.move(data.move)
         this.setState(({ history, pieceSquare }) => ({
+          checkmate: this.game.in_checkmate(),
+          check: this.game.in_check(),
+          draw: this.game.in_draw(),
+          stalemate: this.game.in_stalemate(),
+          lackMaterial: this.game.insufficient_material(),
+          threefold: this.game.in_threefold_repetition(),
           fen: this.game.fen(),
           history: this.game.history({ verbose: true }),
           squareStyles: squareStyling({ pieceSquare, history })
@@ -58,21 +72,24 @@ class HumanVsHuman extends Component{
               borderRadius: "50%"
             }
           },
-          ...squareStyling({
-            history: this.state.history,
-            pieceSquare: this.state.pieceSquare
-          })
+          // ...squareStyling({
+          //   history: this.state.history,
+          //   pieceSquare: this.state.pieceSquare
+          // })
         };
       },
       {}
     );
 
     this.setState(({ squareStyles }) => ({
-      squareStyles: { ...squareStyles, ...highlightStyles }
+      squareStyles: {...highlightStyles }
     }));
   };
 
   onDrop = ({ sourceSquare, targetSquare }) => {
+    const turn = this.game.turn()
+    if(turn !== this.state.color) return
+    
     // see if the move is legal
     let move = this.game.move({
       from: sourceSquare,
@@ -94,6 +111,9 @@ class HumanVsHuman extends Component{
   };
 
   onMouseOverSquare = square => {
+    const turn = this.game.turn()
+    if(turn !== this.state.color) return
+
     // get list of possible moves for this square
     let moves = this.game.moves({
       square: square,
@@ -121,6 +141,9 @@ class HumanVsHuman extends Component{
   };
 
   onSquareClick = square => {
+    const turn = this.game.turn()
+    if(turn !== this.state.color) return
+    
     this.setState(({ history }) => ({
       squareStyles: squareStyling({ pieceSquare: square, history }),
       pieceSquare: square
@@ -147,10 +170,13 @@ class HumanVsHuman extends Component{
 
   //undoes left clicking a square (onSquareClick function)
   onSquareRightClick = square =>
-    this.setState({
-      squareStyles: { [square]: { backgroundColor: "" } },
+    this.setState(({history}) =>({
+      squareStyles: squareStyling({ pieceSquare: square, history}),
+      //squareStyles: { [square]: { backgroundColor: "deepPink" } },
       pieceSquare: ""
-    });
+    }))
+      
+    
 
   //broadcast function
   broadcastMove = (move) => {
@@ -179,15 +205,15 @@ const squareStyling = ({ pieceSquare, history }) => {
     const targetSquare = history.length && history[history.length - 1].to;
   
     return {
-      [pieceSquare]: { backgroundColor: "rgba(255, 255, 0, 0.4)" },
+      [pieceSquare]: { backgroundColor: "rgba(63, 155, 191, 0.6)" },
       ...(history.length && {
         [sourceSquare]: {
-          backgroundColor: "rgba(255, 255, 0, 0.4)"
+          backgroundColor: "rgba(255, 255, 0, 0.5)"
         }
       }),
       ...(history.length && {
         [targetSquare]: {
-          backgroundColor: "rgba(255, 255, 0, 0.4)"
+          backgroundColor: "rgba(255, 255, 0, 0.5)"
         }
       })
     };
@@ -195,9 +221,10 @@ const squareStyling = ({ pieceSquare, history }) => {
 
 export default function PvPGame(props) {
   return (
-    <div>
+    <>
       <HumanVsHuman
-        room={`${props.match.params.room}`}
+        room={props.match.params.room}
+        color={props.location.state.color}
       >
         {({
           position,
@@ -210,25 +237,28 @@ export default function PvPGame(props) {
           onSquareClick,
           onSquareRightClick
         }) => (
-          <Chessboard
-            id="humanVsHuman"
-            width={520}
-            position={position}
-            onDrop={onDrop}
-            onMouseOverSquare={onMouseOverSquare}
-            onMouseOutSquare={onMouseOutSquare}
-            boardStyle={{
-              borderRadius: "5px",
-              boxShadow: `0 5px 15px rgba(0, 0, 0, 0.5)`
-            }}
-            squareStyles={squareStyles}
-            dropSquareStyle={dropSquareStyle}
-            onDragOverSquare={onDragOverSquare}
-            onSquareClick={onSquareClick}
-            onSquareRightClick={onSquareRightClick}
-          />
+          <>
+            <Chessboard
+              id="humanVsHuman"
+              width={520}
+              position={position}
+              onDrop={onDrop}
+              onMouseOverSquare={onMouseOverSquare}
+              onMouseOutSquare={onMouseOutSquare}
+              boardStyle={{
+                borderRadius: "5px",
+                boxShadow: `0 5px 15px rgba(0, 0, 0, 0.5)`
+              }}
+              squareStyles={squareStyles}
+              dropSquareStyle={dropSquareStyle}
+              onDragOverSquare={onDragOverSquare}
+              onSquareClick={onSquareClick}
+              onSquareRightClick={onSquareRightClick}
+            />
+            <GameChat/>
+          </>
         )}
       </HumanVsHuman>
-    </div>
+    </>
   );
 }
