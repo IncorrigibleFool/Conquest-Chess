@@ -134,6 +134,18 @@ module.exports = {
         }
     },
 
+    updateStats: async (req, res) => {
+        const db = req.app.get('db')
+        const {session} = req
+        const {wins, losses, draws, points} = req.body
+        try{
+            const {id} = session.user
+            await db.updateUserStats({wins, losses, draws, points, id})
+        }catch(err){
+            res.sendStatus(500)
+        }
+    },
+
     deleteUser: async (req, res) => {
         const db = req.app.get('db')
         const {session} = req

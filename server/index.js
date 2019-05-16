@@ -52,6 +52,13 @@ io.on('connection', socket => {
     //rooms
     socket.on('join room', data => {
         socket.join(data.room)
+        var room = io.sockets.adapter.rooms[data.room]
+        console.log(room.length)
+    })
+
+    socket.on('leave room', data => {
+        socket.leave(data.room)
+        var room = io.sockets.adapter.rooms[data.room]
     })
 
     socket.on('room message', data => {
@@ -71,6 +78,7 @@ app.post('/auth/register', ctrl.register)
 app.post('/auth/login', ctrl.login)
 app.put('/auth/info/username', ctrl.updateAccountUsername)
 app.put('/auth/info/email', ctrl.updateAccountEmail)
+app.put('/api/stats/update', ctrl.updateStats)
 //app.put('/auth/info/password, ctrl.updateAccountPassword)
 app.delete('/auth/logout', ctrl.logout)
 app.delete('/auth/delete', ctrl.deleteUser)

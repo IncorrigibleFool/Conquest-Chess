@@ -16,6 +16,9 @@ export class GameChat extends Component{
 
     componentDidMount(){
         this.socket.emit('join room', {room: this.props.room})
+        window.addEventListener('beforeunload', () => {
+            this.socket.emit('leave room', {room: this.props.room})
+        })
     }
 
     componentDidUpdate(prevProps){
@@ -106,13 +109,14 @@ export class GameChat extends Component{
 
         return(
             <>
-                <div>
+                <h3>
                     {!this.state.blackTurn && <p>White's turn</p>}
                     {this.state.blackTurn && <p>Black's turn</p>}
-                </div>
+                </h3>
                 <div>
                     <p>Left click on a piece then left click again on a legal square to move, or drag and drop.</p>
                     <p>Right click anywhere to cancel your selected square.</p>
+                    <p>Promotions will always result in a queen.</p>
                     <p>Good luck!</p>
                     {messages}
                     <form onSubmit={this.newMessage}>
