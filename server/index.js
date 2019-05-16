@@ -36,6 +36,10 @@ const io = socketIo(server)
 io.on('connection', socket => {
     console.log('New client connection.')
 
+    socket.on('disconnect', () => {
+        console.log('Client disconnected.')
+    })
+
     //lobby
     socket.on('lobby message', data => {
         io.sockets.emit('lobby message', data)
@@ -53,12 +57,13 @@ io.on('connection', socket => {
     socket.on('join room', data => {
         socket.join(data.room)
         var room = io.sockets.adapter.rooms[data.room]
-        console.log(room.length)
+        console.log(data.id)
     })
 
     socket.on('leave room', data => {
         socket.leave(data.room)
         var room = io.sockets.adapter.rooms[data.room]
+        console.log('Client left room')
     })
 
     socket.on('room message', data => {

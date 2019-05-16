@@ -11,7 +11,7 @@ export class Matchmaker extends Component{
             rooms: [],
             roomName: '',
             color: 'b',
-            chosenColor: 'w'
+            chosenColor: 'w',
         }
         this.socket = io.connect()
         this.socket.on('new room', data => {
@@ -35,20 +35,31 @@ export class Matchmaker extends Component{
         })
     }
 
+    componentWillUnmount(){
+        this.socket.off('new room')
+        this.socket.off('new player')
+    }
+
     newRoom = () => {
         const {roomName : name, color} = this.state
         const {username} = this.props
         axios.put('/api/rooms', {name, color, players: [username]}).then(() => {
             this.socket.emit('new room', {name, color, players: [username]})
+            this.setState({visible: false})
             this.socket.disconnect()
+            this.socket.off('new room')
+            this.socket.off('new player')
         }).catch(err => console.log(err))
-        
     }
 
     enterRoom = (index) => {
         const {username} = this.props
         axios.put('/api/rooms/players', {username, index}).then(() => {
             this.socket.emit('new player', {username, index})
+            this.setState({visible: false})
+            this.socket.disconnect()
+            this.socket.off('new room')
+            this.socket.off('new player')
         }).catch(err => console.log(err))
     }
 

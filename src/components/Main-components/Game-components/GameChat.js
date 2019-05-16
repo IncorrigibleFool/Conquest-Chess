@@ -1,8 +1,7 @@
 import React, {Component} from 'react'
 import io from 'socket.io-client'
-import {connect} from 'react-redux'
 
-export class GameChat extends Component{
+export default class GameChat extends Component{
     constructor(props){
         super(props)
         this.state = {
@@ -130,10 +129,3 @@ export class GameChat extends Component{
         )
     }
 }
-
-const mapStateToProps = (reduxState) => {
-    const {username} = reduxState
-    return {username}
-}
-
-export default connect(mapStateToProps)(GameChat)

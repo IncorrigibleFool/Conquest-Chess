@@ -47,30 +47,27 @@ class HumanVsHuman extends Component{
           lackMaterial: this.game.insufficient_material(),
           threefold: this.game.in_threefold_repetition(),
           turn: this.game.turn(),
+          prematureEnd: !this.game.game_over(),
           fen: this.game.fen(),
           history: this.game.history({ verbose: true }),
           squareStyles: squareStyling({ pieceSquare, history })
         }));
-        if(this.state.gameOver || this.state.draw){
-          this.setState({
-            prematureEnd: false
-          })
-        }
       })
     }
 
   componentDidMount() {
     this.game = new Chess();
-    this.socket.emit('join room', {room: this.props.room})
+    this.socket.emit('join room', {room: this.props.room, username: this.props.username, id: this.props.id})
     window.addEventListener('beforeunload', () => {
-      this.socket.emit('leave room', {room: this.props.room})
-      if(this.state.prematureEnd){
-        var {id, wins, losses, draws, points} = this.props
-        losses += 1
-        axios.put('/api/stats/update', {id, wins, losses, draws, points}).then(() => {
-          this.updateStats({wins, losses, draws, points})
-        })
-      }
+      this.socket.emit('leave room', {room: this.props.room, username: this.props.username, id: this.props.id})
+      this.socket.disconnect()
+      // if(this.state.prematureEnd){
+      //   var {id, wins, losses, draws, points} = this.props
+      //   losses += 1
+      //   axios.put('/api/stats/update', {id, wins, losses, draws, points}).then(() => {
+      //     this.updateStats({wins, losses, draws, points})
+      //   })
+      // }
     })
   }
 
@@ -123,7 +120,7 @@ class HumanVsHuman extends Component{
     if (move === null) return;
 
     this.setState(({ history, pieceSquare }) => ({
-      gameOver: this.game_over(),
+      gameOver: this.game.game_over(),
       checkmate: this.game.in_checkmate(),
       check: this.game.in_check(),
       draw: this.game.in_draw(),
@@ -131,15 +128,11 @@ class HumanVsHuman extends Component{
       lackMaterial: this.game.insufficient_material(),
       threefold: this.game.in_threefold_repetition(),
       turn: this.game.turn(),
+      prematureEnd: !this.game.game_over(),
       fen: this.game.fen(),
       history: this.game.history({ verbose: true }),
       squareStyles: squareStyling({ pieceSquare, history })
     }));
-    if(this.state.gameOver || this.state.draw){
-      this.setState({
-        prematureEnd: false
-      })
-    }
 
     //broadcast move to socket
     this.broadcastMove(move)
@@ -202,14 +195,10 @@ class HumanVsHuman extends Component{
       lackMaterial: this.game.insufficient_material(),
       threefold: this.game.in_threefold_repetition(),
       turn: this.game.turn(),
+      prematureEnd: !this.game.game_over(),
       fen: this.game.fen(),
       history: this.game.history({ verbose: true }),
     });
-    if(this.state.gameOver || this.state.draw){
-      this.setState({
-        prematureEnd: false
-      })
-    }
 
     //broadcast move
     this.broadcastMove(move)
@@ -231,7 +220,7 @@ class HumanVsHuman extends Component{
 
   render() {
     const { fen, dropSquareStyle, squareStyles, gameOver, checkmate, check, draw, stalemate, lackMaterial, threefold, turn} = this.state;
-    const {room} = this.props
+    const {room, username} = this.props
 
     return this.props.children({
       squareStyles,
@@ -245,6 +234,7 @@ class HumanVsHuman extends Component{
       onSquareRightClick: this.onSquareRightClick,
       //GameChat props
       room,
+      username,
       gameOver,
       checkmate,
       check,
@@ -281,6 +271,7 @@ export function PvPGame(props) {
     <>
       <HumanVsHuman
         room={props.match.params.room}
+        username={props.username}
         color={props.location.state.color}
         wins={props.wins}
         losses={props.losses}
@@ -298,6 +289,7 @@ export function PvPGame(props) {
           onSquareClick,
           onSquareRightClick,
           room,
+          username,
           gameOver,
           checkmate,
           check,
@@ -328,6 +320,7 @@ export function PvPGame(props) {
             <GameChat
               id="gameChat"
               room={room}
+              username={username}
               gameOver={gameOver}
               checkmate={checkmate}
               check={check}
@@ -345,8 +338,8 @@ export function PvPGame(props) {
 }
 
 const mapStateToProps = (reduxState) => {
-  const {id, wins, losses, draws, points} = reduxState
-  return {id, wins, losses, draws, points}
+  const {username, id, wins, losses, draws, points} = reduxState
+  return {username, id, wins, losses, draws, points}
 }
 
 const mapDispatchToProps = {
