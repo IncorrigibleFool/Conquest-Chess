@@ -12,7 +12,9 @@ export class Matchmaker extends Component{
             roomName: '',
             color: 'b',
             chosenColor: 'w',
+            nameTaken: false
         }
+        this.handleInput = this.handleInput.bind(this)
         this.socket = io.connect()
         this.socket.on('new room', data => {
             this.setState({
@@ -26,6 +28,16 @@ export class Matchmaker extends Component{
                 rooms: tempArr
             })
         })
+        this.socket.on('room update', data => {
+            if(data.connections === undefined){
+                const index = this.state.rooms.indexOf(data.room)
+                var tempArr = this.state.rooms
+                tempArr.splice(index, 1)
+                this.setState({
+                    rooms: tempArr
+                })
+            }
+        })
     }
 
     async componentDidMount(){
@@ -38,17 +50,20 @@ export class Matchmaker extends Component{
     componentWillUnmount(){
         this.socket.off('new room')
         this.socket.off('new player')
+        this.socket.off('room update')
     }
 
     newRoom = () => {
         const {roomName : name, color} = this.state
         const {username} = this.props
-        axios.put('/api/rooms', {name, color, players: [username]}).then(() => {
-            this.socket.emit('new room', {name, color, players: [username]})
-            this.setState({visible: false})
+        axios.put('/api/rooms', {name, color, players: [username]}).then((res) => {
+            const length = res.data.length
+            const room = res.data[length - 1]
+            this.socket.emit('new room', room)
             this.socket.disconnect()
             this.socket.off('new room')
             this.socket.off('new player')
+            this.socket.off('room update')
         }).catch(err => console.log(err))
     }
 
@@ -56,17 +71,29 @@ export class Matchmaker extends Component{
         const {username} = this.props
         axios.put('/api/rooms/players', {username, index}).then(() => {
             this.socket.emit('new player', {username, index})
-            this.setState({visible: false})
             this.socket.disconnect()
             this.socket.off('new room')
             this.socket.off('new player')
+            this.socket.off('room update')
         }).catch(err => console.log(err))
     }
 
-    handleInput = (event) => {
-        this.setState({
+    async handleInput(event){
+        await this.setState({
             [event.target.name]: event.target.value
         })
+        const exists = this.state.rooms.some(index => {
+            return this.state.roomName === index.name
+        })
+        if(exists){
+            this.setState({
+                nameTaken: true
+            })
+        }else{
+            this.setState({
+                nameTaken: false
+            })
+        }
     }
 
     handleOption = (event) => {
@@ -129,9 +156,13 @@ export class Matchmaker extends Component{
                     <option value='b'>White</option>
                     <option value='w'>Black</option>
                 </select>
-                <Link to={{pathname: `/main/game/${this.state.roomName}`, state:{color: this.state.chosenColor}}}>
-                    <button onClick={this.newRoom}>Make Room</button>
-                </Link>
+                {
+                    !this.state.nameTaken &&
+                    <Link to={{pathname: `/main/game/${this.state.roomName}`, state:{color: this.state.chosenColor}}}>
+                        <button onClick={this.newRoom}>Make Room</button>
+                    </Link>
+                }
+                {this.state.nameTaken && <p>Room already exists.</p>}
             </>
         )
     }

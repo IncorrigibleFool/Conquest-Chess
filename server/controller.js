@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs')
 
+var id = 0
 var rooms = []
 
 module.exports = {
@@ -169,12 +170,17 @@ module.exports = {
 
     updateRooms: (req, res) => {
         const {name, color, players} = req.body
-        rooms.push({name, color, players})
+        var roomId = ++id
+        rooms.push({name, color, players, roomId})
         try{
             res.send(rooms)
         }catch(err){
             res.sendStatus(500)
         }
+    },
+    deleteRoom: (room) => {
+        const index = rooms.indexOf(room)
+        rooms.splice(index, 1)
     },
 
     updatePlayers: (req, res) => {

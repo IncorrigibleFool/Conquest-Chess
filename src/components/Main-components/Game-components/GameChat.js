@@ -11,6 +11,7 @@ export default class GameChat extends Component{
         }
         this.socket = io.connect()
         this.socket.on('room message', data => this.updateMessages(data))
+        this.socket.on('leave room', data => this.leftRoom(data))
     }
 
     componentDidMount(){
@@ -63,6 +64,13 @@ export default class GameChat extends Component{
                 })
             }
         }
+    }
+
+    leftRoom = (data) => {
+        if(data.username === undefined) return
+        this.setState({
+            messages: [...this.state.messages, {message: `${data.username} has left the game.`}]
+        })
     }
 
     newMessage = (event) => {

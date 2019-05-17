@@ -33,7 +33,8 @@ class HumanVsHuman extends Component{
         // currently clicked square
         square: "",
         // array of past game moves
-        history: []
+        history: [],
+        opponent: null
       };
       this.socket = io.connect()
       this.socket.on('move', data => {
@@ -53,6 +54,9 @@ class HumanVsHuman extends Component{
           squareStyles: squareStyling({ pieceSquare, history })
         }));
       })
+      this.socket.on('join room', data => this.joinRoom(data))
+      this.socket.on('join response', data => this.joinResponse(data))
+      this.socket.on('leave room', data => this.leftRoom(data))
     }
 
   componentDidMount() {
@@ -69,6 +73,27 @@ class HumanVsHuman extends Component{
       //   })
       // }
     })
+  }
+
+  joinRoom = (data) => {
+    if(data.username === undefined) return
+    if(this.state.opponent !== null) return
+    this.setState({
+      opponent: data.id
+    })
+    this.socket.emit('join response', {room: this.props.room, username: this.props.username, id: this.props.id})
+  }
+
+  joinResponse = (data) => {
+    if(data.username === undefined) return
+    if(this.state.opponent !== null) return
+    this.setState({
+      opponent: data.id
+    })
+  }
+
+  leftRoom = (data) => {
+
   }
 
   // keep clicked square style and remove hint squares
@@ -272,6 +297,7 @@ export function PvPGame(props) {
       <HumanVsHuman
         room={props.match.params.room}
         username={props.username}
+        id={props.id}
         color={props.location.state.color}
         wins={props.wins}
         losses={props.losses}
