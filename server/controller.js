@@ -142,6 +142,18 @@ module.exports = {
         try{
             const {id} = session.user
             await db.updateUserStats({wins, losses, draws, points, id})
+            res.sendStatus(200)
+        }catch(err){
+            res.sendStatus(500)
+        }
+    },
+
+    updatePenalty: async (req, res) => {
+        const db = req.app.get('db')
+        const {id} = req.body
+        try{
+            await db.updateUserPenalty({id})
+            res.sendStatus(200)
         }catch(err){
             res.sendStatus(500)
         }
@@ -178,6 +190,7 @@ module.exports = {
             res.sendStatus(500)
         }
     },
+    
     deleteRoom: (room) => {
         const index = rooms.indexOf(room)
         rooms.splice(index, 1)

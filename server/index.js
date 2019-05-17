@@ -73,6 +73,7 @@ io.on('connection', socket => {
 
     socket.on('move', data => {
         socket.to(data.room).emit('move', data)
+        io.in(data.room).emit('move console')
     })
 })
 
@@ -85,6 +86,7 @@ app.post('/auth/login', ctrl.login)
 app.put('/auth/info/username', ctrl.updateAccountUsername)
 app.put('/auth/info/email', ctrl.updateAccountEmail)
 app.put('/api/stats/update', ctrl.updateStats)
+app.put('/api/stats/penalty', ctrl.updatePenalty)
 //app.put('/auth/info/password, ctrl.updateAccountPassword)
 app.delete('/auth/logout', ctrl.logout)
 app.delete('/auth/delete', ctrl.deleteUser)

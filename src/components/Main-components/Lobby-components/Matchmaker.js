@@ -31,11 +31,23 @@ export class Matchmaker extends Component{
         this.socket.on('room update', data => {
             if(data.connections === undefined){
                 const index = this.state.rooms.indexOf(data.room)
-                var tempArr = this.state.rooms
+                let tempArr = this.state.rooms
                 tempArr.splice(index, 1)
                 this.setState({
                     rooms: tempArr
                 })
+                return
+            }
+            //catches instances where the server messes up and doesn't disconnect all listeners
+            if(data.connections.length){
+                if(data.connections.length === 1){
+                    const index = this.state.rooms.indexOf(data.room)
+                    let tempArr = this.state.rooms
+                    tempArr.splice(index, 1)
+                    this.setState({
+                        rooms: tempArr
+                    })
+                }  
             }
         })
     }
@@ -127,7 +139,7 @@ export class Matchmaker extends Component{
                 <div key={i}>
                     <h3>{room.name}</h3>
                     <h4>{`${room.players[0]} (${color}) vs ${room.players[1]} (${challengerColor})`}</h4>
-                    <Link to={{pathname: `/main/game/${room.name}`, state: {color: null}}}>
+                    <Link to={{pathname: `/main/game/${room.name}`, state: {color: null, player: false}}}>
                         <button>Watch</button>
                     </Link>
                 </div>
@@ -136,7 +148,7 @@ export class Matchmaker extends Component{
                 <div key={i}>
                     <h3>{room.name}</h3>
                     <h4>{`${room.players[0]} (${color})`} seeking opponent</h4>
-                    <Link to ={{pathname:`/main/game/${room.name}`, state: {color: room.color}}}>
+                    <Link to ={{pathname:`/main/game/${room.name}`, state: {color: room.color, player: true}}}>
                         <button onClick={() => this.enterRoom(i)}>Enter</button>
                     </Link>
                 </div>
@@ -158,7 +170,7 @@ export class Matchmaker extends Component{
                 </select>
                 {
                     !this.state.nameTaken &&
-                    <Link to={{pathname: `/main/game/${this.state.roomName}`, state:{color: this.state.chosenColor}}}>
+                    <Link to={{pathname: `/main/game/${this.state.roomName}`, state:{color: this.state.chosenColor, player: true}}}>
                         <button onClick={this.newRoom}>Make Room</button>
                     </Link>
                 }

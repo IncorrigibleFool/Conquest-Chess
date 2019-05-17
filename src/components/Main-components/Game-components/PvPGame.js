@@ -36,6 +36,7 @@ class HumanVsHuman extends Component{
         history: [],
         opponent: null
       };
+      this.leftRoom = this.leftRoom.bind(this)
       this.socket = io.connect()
       this.socket.on('move', data => {
         this.game.move(data.move)
@@ -65,19 +66,13 @@ class HumanVsHuman extends Component{
     window.addEventListener('beforeunload', () => {
       this.socket.emit('leave room', {room: this.props.room, username: this.props.username, id: this.props.id})
       this.socket.disconnect()
-      // if(this.state.prematureEnd){
-      //   var {id, wins, losses, draws, points} = this.props
-      //   losses += 1
-      //   axios.put('/api/stats/update', {id, wins, losses, draws, points}).then(() => {
-      //     this.updateStats({wins, losses, draws, points})
-      //   })
-      // }
     })
   }
 
   joinRoom = (data) => {
     if(data.username === undefined) return
     if(this.state.opponent !== null) return
+    if(!this.props.player) return
     this.setState({
       opponent: data.id
     })
@@ -87,13 +82,21 @@ class HumanVsHuman extends Component{
   joinResponse = (data) => {
     if(data.username === undefined) return
     if(this.state.opponent !== null) return
+    if(!this.props.player) return
     this.setState({
       opponent: data.id
     })
   }
 
-  leftRoom = (data) => {
-
+  async leftRoom(data){
+    if(!this.props.player) return
+    if(this.state.prematureEnd && this.state.opponent === data.id){
+      await axios.put('/api/stats/penalty', {id: data.id})
+      var {wins, losses, draws, points} = this.props
+      wins += 1
+      await axios.put('/api/stats/update', {wins, losses, draws, points})
+      this.props.updateStats({wins, losses, draws, points})
+    }
   }
 
   // keep clicked square style and remove hint squares
@@ -295,10 +298,12 @@ export function PvPGame(props) {
   return (
     <>
       <HumanVsHuman
+        updateStats={props.updateStats}
         room={props.match.params.room}
         username={props.username}
         id={props.id}
         color={props.location.state.color}
+        player={props.location.state.player}
         wins={props.wins}
         losses={props.losses}
         draws={props.draws}

@@ -12,6 +12,7 @@ export default class GameChat extends Component{
         this.socket = io.connect()
         this.socket.on('room message', data => this.updateMessages(data))
         this.socket.on('leave room', data => this.leftRoom(data))
+        this.socket.on('move console', () => this.onMove())
     }
 
     componentDidMount(){
@@ -21,55 +22,53 @@ export default class GameChat extends Component{
         })
     }
 
-    componentDidUpdate(prevProps){
-        if(this.props !== prevProps){
-            if(this.props.turn === 'w'){
-                this.setState({
-                    blackTurn: false
-                })
-            }
-            if(this.props.turn === 'b'){
-                this.setState({
-                    blackTurn: true
-                })
-            }
-            if(this.props.check && !this.props.checkmate){
-                this.setState({
-                    messages: [...this.state.messages, {message: 'Check!'}]
-                })
-            }
-            if(this.props.check && this.props.checkmate){
-                this.setState({
-                    messages: [...this.state.messages, {message: 'Checkmate!'}]
-                })
-            }
-            if(this.props.stalemate){
-                this.setState({
-                    messages: [...this.state.messages, {message: 'Draw due to stalemate.'}]
-                })
-            }
-            if(this.props.threefold){
-                this.setState({
-                    messages: [...this.state.messages, {message: 'Draw due to threefold rule.'}]
-                })
-            }
-            if(this.props.lackMaterial){
-                this.setState({
-                    messages: [...this.state.messages, {message: 'Draw due to lack of material.'}]
-                })
-            }
-            if(this.props.draw && !this.props.stalemate && !this.props.threefold && !this.props.lackMaterial){
-                this.setState({
-                    messages: [...this.state.messages, {message: 'Draw due to 50-move rule.'}]
-                })
-            }
+    onMove = () => {
+        if(this.props.turn === 'w'){
+            this.setState({
+                blackTurn: false
+            })
+        }
+        if(this.props.turn === 'b'){
+            this.setState({
+                blackTurn: true
+            })
+        }
+        if(this.props.check && !this.props.checkmate){
+            this.setState({
+                messages: [...this.state.messages, {message: 'Check!'}]
+            })
+        }
+        if(this.props.check && this.props.checkmate){
+            this.setState({
+                messages: [...this.state.messages, {message: 'Checkmate!'}]
+            })
+        }
+        if(this.props.stalemate){
+            this.setState({
+                messages: [...this.state.messages, {message: 'Draw due to stalemate.'}]
+            })
+        }
+        if(this.props.threefold){
+            this.setState({
+                messages: [...this.state.messages, {message: 'Draw due to threefold rule.'}]
+            })
+        }
+        if(this.props.lackMaterial){
+            this.setState({
+                messages: [...this.state.messages, {message: 'Draw due to lack of material.'}]
+            })
+        }
+        if(this.props.draw && !this.props.stalemate && !this.props.threefold && !this.props.lackMaterial){
+            this.setState({
+                messages: [...this.state.messages, {message: 'Draw due to 50-move rule.'}]
+            })
         }
     }
 
     leftRoom = (data) => {
         if(data.username === undefined) return
         this.setState({
-            messages: [...this.state.messages, {message: `${data.username} has left the game.`}]
+            messages: [...this.state.messages, {message: `${data.username} has left the room.`}]
         })
     }
 
