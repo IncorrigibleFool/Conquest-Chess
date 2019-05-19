@@ -34,26 +34,17 @@ class HumanVsHuman extends Component{
         square: "",
         // array of past game moves
         history: [],
-        opponent: null
+        opponent: null,
+        victory: false
       };
       this.leftRoom = this.leftRoom.bind(this)
+      this.handleGameResult = this.handleGameResult.bind(this)
+      this.onSquareClick = this.onSquareClick.bind(this)
+      this.resolveMove = this.resolveMove.bind(this)
       this.socket = io.connect()
       this.socket.on('move', data => {
         this.game.move(data.move)
-        this.setState(({ history, pieceSquare }) => ({
-          gameOver: this.game.game_over(),
-          checkmate: this.game.in_checkmate(),
-          check: this.game.in_check(),
-          draw: this.game.in_draw(),
-          stalemate: this.game.in_stalemate(),
-          lackMaterial: this.game.insufficient_material(),
-          threefold: this.game.in_threefold_repetition(),
-          turn: this.game.turn(),
-          prematureEnd: !this.game.game_over(),
-          fen: this.game.fen(),
-          history: this.game.history({ verbose: true }),
-          squareStyles: squareStyling({ pieceSquare, history })
-        }));
+        this.resolveMove()
       })
       this.socket.on('join room', data => this.joinRoom(data))
       this.socket.on('join response', data => this.joinResponse(data))
@@ -67,6 +58,24 @@ class HumanVsHuman extends Component{
       this.socket.emit('leave room', {room: this.props.room, username: this.props.username, id: this.props.id})
       this.socket.disconnect()
     })
+  }
+
+  async resolveMove(){
+    await this.setState(({ history, pieceSquare }) => ({
+      gameOver: this.game.game_over(),
+      checkmate: this.game.in_checkmate(),
+      check: this.game.in_check(),
+      draw: this.game.in_draw(),
+      stalemate: this.game.in_stalemate(),
+      lackMaterial: this.game.insufficient_material(),
+      threefold: this.game.in_threefold_repetition(),
+      turn: this.game.turn(),
+      prematureEnd: !this.game.game_over(),
+      fen: this.game.fen(),
+      history: this.game.history({ verbose: true }),
+      squareStyles: squareStyling({ pieceSquare, history })
+    }))
+    this.handleGameResult()
   }
 
   joinRoom = (data) => {
@@ -88,6 +97,7 @@ class HumanVsHuman extends Component{
     })
   }
 
+  //penalizes opponent who left early with a loss and awards remaining player a win
   async leftRoom(data){
     if(!this.props.player) return
     if(this.state.prematureEnd && this.state.opponent === data.id){
@@ -96,6 +106,33 @@ class HumanVsHuman extends Component{
       wins += 1
       await axios.put('/api/stats/update', {wins, losses, draws, points})
       this.props.updateStats({wins, losses, draws, points})
+    }
+  }
+
+  //updates stats on win, loss or draw and updates state to display appropriate image for each scenario
+  async handleGameResult(){
+    if(this.state.gameOver){
+      if(this.state.checkmate && this.state.turn !== this.props.color){
+        let {wins, losses, draws, points} = this.props
+        wins += 1
+        await axios.put('/api/stats/update', {wins, losses, draws, points})
+        this.props.updateStats({wins, losses, draws, points})
+        this.setState({
+          victory: true
+        })
+      }
+      if(this.state.checkmate && this.state.turn === this.props.color){
+        let {wins, losses, draws, points} = this.props
+        losses += 1
+        await axios.put('/api/stats/update', {wins, losses, draws, points})
+        this.props.updateStats({wins, losses, draws, points})
+      }
+      if(this.state.draw){
+        let {wins, losses, draws, points} = this.props
+        draws += 1
+        await axios.put('/api/stats/update', {wins, losses, draws, points})
+        this.props.updateStats({wins, losses, draws, points})
+      }
     }
   }
 
@@ -147,20 +184,7 @@ class HumanVsHuman extends Component{
     // illegal move
     if (move === null) return;
 
-    this.setState(({ history, pieceSquare }) => ({
-      gameOver: this.game.game_over(),
-      checkmate: this.game.in_checkmate(),
-      check: this.game.in_check(),
-      draw: this.game.in_draw(),
-      stalemate: this.game.in_stalemate(),
-      lackMaterial: this.game.insufficient_material(),
-      threefold: this.game.in_threefold_repetition(),
-      turn: this.game.turn(),
-      prematureEnd: !this.game.game_over(),
-      fen: this.game.fen(),
-      history: this.game.history({ verbose: true }),
-      squareStyles: squareStyling({ pieceSquare, history })
-    }));
+    this.resolveMove()
 
     //broadcast move to socket
     this.broadcastMove(move)
@@ -196,7 +220,7 @@ class HumanVsHuman extends Component{
     });
   };
 
-  onSquareClick = square => {
+  async onSquareClick(square){
     const turn = this.game.turn()
     if(turn !== this.props.color) return
     
@@ -214,7 +238,7 @@ class HumanVsHuman extends Component{
     // illegal move
     if (move === null) return;
 
-    this.setState({
+    await this.setState({
       gameOver: this.game.game_over(),
       checkmate: this.game.in_checkmate(),
       check: this.game.in_check(),
@@ -226,7 +250,9 @@ class HumanVsHuman extends Component{
       prematureEnd: !this.game.game_over(),
       fen: this.game.fen(),
       history: this.game.history({ verbose: true }),
-    });
+    })
+    
+    this.handleGameResult()
 
     //broadcast move
     this.broadcastMove(move)
@@ -236,7 +262,6 @@ class HumanVsHuman extends Component{
   onSquareRightClick = square => {
     this.setState(({history}) =>({
       squareStyles: squareStyling({ square, history}),
-      //squareStyles: { [square]: { backgroundColor: "deepPink" } },
       pieceSquare: ""
     }))
   }
@@ -247,31 +272,36 @@ class HumanVsHuman extends Component{
   }
 
   render() {
-    const { fen, dropSquareStyle, squareStyles, gameOver, checkmate, check, draw, stalemate, lackMaterial, threefold, turn} = this.state;
-    const {room, username} = this.props
+    const { fen, dropSquareStyle, squareStyles, gameOver, checkmate, check, draw, stalemate, lackMaterial, threefold, turn, opponent} = this.state;
+    const {room, username, player} = this.props
 
-    return this.props.children({
-      squareStyles,
-      position: fen,
-      onMouseOverSquare: this.onMouseOverSquare,
-      onMouseOutSquare: this.onMouseOutSquare,
-      onDrop: this.onDrop,
-      dropSquareStyle,
-      onDragOverSquare: this.onDragOverSquare,
-      onSquareClick: this.onSquareClick,
-      onSquareRightClick: this.onSquareRightClick,
-      //GameChat props
-      room,
-      username,
-      gameOver,
-      checkmate,
-      check,
-      draw,
-      stalemate,
-      lackMaterial,
-      threefold,
-      turn
-    });
+    if(opponent === null && player){
+      return(<h1>Awaiting opponent</h1>)
+    }
+    else{
+      return this.props.children({
+        squareStyles,
+        position: fen,
+        onMouseOverSquare: this.onMouseOverSquare,
+        onMouseOutSquare: this.onMouseOutSquare,
+        onDrop: this.onDrop,
+        dropSquareStyle,
+        onDragOverSquare: this.onDragOverSquare,
+        onSquareClick: this.onSquareClick,
+        onSquareRightClick: this.onSquareRightClick,
+        //GameChat props
+        room,
+        username,
+        gameOver,
+        checkmate,
+        check,
+        draw,
+        stalemate,
+        lackMaterial,
+        threefold,
+        turn
+      });
+    }
   }
 }
 

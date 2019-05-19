@@ -42,7 +42,6 @@ export class Stats extends Component{
         
         return(
             <>
-                <h3>Stats</h3>
                 <Pie
                     data={{
                         datasets: [{

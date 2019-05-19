@@ -116,8 +116,8 @@ export default class GameChat extends Component{
         return(
             <>
                 <h3>
-                    {!this.state.blackTurn && <p>White's turn</p>}
-                    {this.state.blackTurn && <p>Black's turn</p>}
+                    {!this.state.blackTurn && <p>White's Turn</p>}
+                    {this.state.blackTurn && <p>Black's Turn</p>}
                 </h3>
                 <div>
                     <p>Left click on a piece then left click again on a legal square to move, or drag and drop.</p>

@@ -42,7 +42,6 @@ export class Navbar extends Component{
 
         return(
             <>
-                <h2>Navbar</h2>
                 <Link to='/main/account'>
                     <button>Account</button>
                 </Link>

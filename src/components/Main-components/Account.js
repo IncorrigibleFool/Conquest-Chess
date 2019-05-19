@@ -117,14 +117,13 @@ export class Account extends Component{
 
         return(
             <>
-                <h3>Account</h3>
                 <h4>{username}</h4>
                 <h4>{email}</h4>
                 <h4>{firstname} {lastname}</h4>
                 {/* edit block */}
                 <div>
                     {!editMode && <button onClick={this.toggleUpdate}>Change Info</button>}
-                    {editMode && <button>Change Password</button>}
+                    {/* {editMode && <button>Change Password</button>} */}
                     {
                         editMode &&
                         <form>
