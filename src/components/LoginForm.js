@@ -3,6 +3,7 @@ import axios from 'axios'
 import {Redirect, Link} from 'react-router-dom'
 import {connect} from 'react-redux';
 import{authenticate, updateId, updateUsername, updateName, updateStats, updateEmail} from '../redux/reducer'
+import './Login.css'
 
 export class LoginForm extends Component{
     constructor(){
@@ -62,27 +63,28 @@ export class LoginForm extends Component{
         }
 
         return(
-            <>
-            <form onSubmit={this.handleSubmit}>
-                <input
-                    name='username'
-                    placeholder='Username'
-                    value={this.state.username}
-                    onChange={this.handleUpdate}
-                />
-                <input
-                    name='password'
-                    placeholder='Password'
-                    value={this.state.password}
-                    onChange={this.handleUpdate}
-                />
-                <button>Login</button>
-            </form>
-            {this.state.loginError && <h3>Username or password is incorrect. Please try again.</h3>}
-            <Link to='/register'>
-                <button>Register</button>
-            </Link>
-            </>
+            <div className='login-form'>
+                <img id='logo' src="conquest-chess-logo.png" alt='oops'/>
+                <form onSubmit={this.handleSubmit}>
+                    <input
+                        name='username'
+                        placeholder='Username'
+                        value={this.state.username}
+                        onChange={this.handleUpdate}
+                    />
+                    <input
+                        name='password'
+                        placeholder='Password'
+                        value={this.state.password}
+                        onChange={this.handleUpdate}
+                    />
+                    <button>Login</button>
+                </form>
+                {this.state.loginError && <h3>Username or password is incorrect. Please try again.</h3>}
+                <Link to='/register'>
+                    <button>Register</button>
+                </Link>
+            </div>
         )
     }
     

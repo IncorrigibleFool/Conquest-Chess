@@ -1,0 +1,27 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+.login-container{
+    height: 100vh;
+    overflow: hidden;
+}
+
+.login-background{
+    background: url(../assets/chess-background-condensed.jpg) repeat;
+    background-size: 2111px, 2111px;
+    height: 6333px;
+    width: 6333px;
+    animation: slide 45s linear infinite;
+}
+
+@keyframes slide{
+    0%{
+        background-position-x: 0;
+        background-position-y: 0
+    }
+    100%{
+        background-position-x: -2111px;
+        background-position-y: -2111px;
+    }
+}
