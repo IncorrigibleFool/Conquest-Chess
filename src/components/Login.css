@@ -12,7 +12,97 @@
     background-size: 2111px, 2111px;
     height: 6333px;
     width: 6333px;
-    animation: slide 45s linear infinite;
+    animation: slide 60s linear infinite;
+}
+
+#logo{
+    margin-top: 1.5rem;
+    height: 230px;
+    width: 624px;
+}
+
+.login-form-container{
+    position: absolute;
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-form{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    background-color: rgb(31, 31, 31);
+    height: 90vh;
+    width: 50vw;
+    box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);
+}
+
+#login-options{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height:30vh;
+    margin-top: 5vh;
+    align-items: center;
+}
+
+.input-login{
+    height: 2rem;
+    border: transparent;
+    border-bottom: 3px solid red;
+    background-color: rgb(31,31,31);
+    color: white;
+    width: 25vw;
+}
+
+#login-error{
+    color: #ff0000;
+}
+
+.circle-loader{
+    border: 3px solid hsla(293, 100%, 62%, 0.2);
+    border-top-color: #f83cff;
+    border-radius: 50%;
+    width: 3em;
+    height: 3em;
+    animation: spin 1s linear infinite;
+}
+
+.button {
+	-moz-box-shadow:inset 0px -3px 7px 0px #f86656;
+	-webkit-box-shadow:inset 0px -3px 7px 0px #f86656;
+	box-shadow:inset 0px -3px 7px 0px #f86656;
+	background-color:#ff0000;
+	-moz-border-radius:3px;
+	-webkit-border-radius:3px;
+	border-radius:3px;
+	border:1px solid #d83526;
+	display:inline-block;
+	cursor:pointer;
+	color:#ffffff;
+	font-family:Arial;
+	font-size:15px;
+	padding:9px 23px;
+	text-decoration:none;
+	text-shadow:0px 1px 0px #b23e35;
+}
+.button:hover {
+	background-color:#df0000;
+}
+.button:active {
+	position:relative;
+	top:1px;
+}
+  
+@keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
 }
 
 @keyframes slide{
@@ -23,5 +113,51 @@
     100%{
         background-position-x: -2111px;
         background-position-y: -2111px;
+    }
+}
+
+
+
+/* 1024 */
+@media (max-width: 1126px){
+    #logo{
+        height: 282px;
+        width: 760px;
+    }
+    .login-form{
+        width: 788px
+    }
+}
+
+/* 768 */
+@media (max-width: 845px){
+    #logo{
+        height: 210px;
+        width: 567px;
+    }
+    .login-form{
+        width: 592px
+    }
+}
+
+/* 460 */
+@media (max-width: 528px){
+    #logo{
+        height: 130px;
+        width: 351px;
+    }
+    .login-form{
+        width: 360px;
+    }
+}
+
+/* 360 */
+@media(max-width: 396px){
+    #logo{
+        height: 100px;
+        width: 270px;
+    }
+    .login-form{
+        width: 300px;
     }
 }

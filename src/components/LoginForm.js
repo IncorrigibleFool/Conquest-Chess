@@ -12,7 +12,8 @@ export class LoginForm extends Component{
             username: '',
             password: '',
             loginError: false,
-            loginSuccess: false
+            loginSuccess: false,
+            loginAttempt: false
         }
     }
 
@@ -26,6 +27,9 @@ export class LoginForm extends Component{
 
     handleSubmit = async (event) => {
         event.preventDefault()
+        this.setState({
+            loginAttempt: true
+        })
         const {username, password} = this.state
         try{
             const login = await axios.post('/auth/login', {username, password})
@@ -52,7 +56,8 @@ export class LoginForm extends Component{
             this.setState({
                 username: '',
                 password: '',
-                loginError: true
+                loginError: true,
+                loginAttempt: false
             })
         }
     }
@@ -63,28 +68,42 @@ export class LoginForm extends Component{
         }
 
         return(
-            <div className='login-form'>
-                <img id='logo' src="conquest-chess-logo.png" alt='oops'/>
-                <form onSubmit={this.handleSubmit}>
-                    <input
-                        name='username'
-                        placeholder='Username'
-                        value={this.state.username}
-                        onChange={this.handleUpdate}
-                    />
-                    <input
-                        name='password'
-                        placeholder='Password'
-                        value={this.state.password}
-                        onChange={this.handleUpdate}
-                    />
-                    <button>Login</button>
-                </form>
-                {this.state.loginError && <h3>Username or password is incorrect. Please try again.</h3>}
-                <Link to='/register'>
-                    <button>Register</button>
-                </Link>
+            <div className='login-form-container'>
+                <div className='login-form'>
+                    <img id='logo' src={require("../assets/logo.png")} alt='logo'></img>
+                    <form id='login-options' onSubmit={this.handleSubmit}>
+                        <input
+                            className='input-login'
+                            type='text'
+                            name='username'
+                            placeholder='Username'
+                            value={this.state.username}
+                            onChange={this.handleUpdate}
+                        />
+                        <input
+                            className='input-login'
+                            type='password'
+                            name='password'
+                            placeholder='Password'
+                            value={this.state.password}
+                            onChange={this.handleUpdate}
+                        />
+                        <button className='button'>Login</button>
+                    </form>
+                    {this.state.loginError && <h3 id='login-error'>Username or password is incorrect. Please try again.</h3>}
+                    {
+                        !this.state.loginAttempt &&
+                        <Link to='/register'>
+                            <button className='button'>Register</button>
+                        </Link>
+                    }
+                    {
+                        this.state.loginAttempt &&
+                        <div className='circle-loader'></div>
+                    }
+                </div>
             </div>
+            
         )
     }
     
