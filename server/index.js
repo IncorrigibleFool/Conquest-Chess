@@ -5,10 +5,12 @@ const session = require('express-session')
 const app = express()
 const ctrl = require('./controller')
 const socketIo = require('socket.io')
+const path = require('path')
 
 const {SERVER_PORT, SESSION_SECRET, CONNECTION_STRING} = process.env
 
 //middleware
+app.use(express.static(`${__dirname}/../build`))
 app.use(express.json())
 app.use(session({
     secret: SESSION_SECRET,
@@ -93,3 +95,7 @@ app.delete('/auth/delete', ctrl.deleteUser)
 app.get('/api/rooms', ctrl.getRooms)
 app.put('/api/rooms', ctrl.updateRooms)
 app.put('/api/rooms/players', ctrl.updatePlayers)
+
+app.get('*', (req, res)=>{
+    res.sendFile(path.join(__dirname, '../build/index.html'));
+});
