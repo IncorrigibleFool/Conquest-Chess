@@ -1,0 +1,49 @@
+#chart{
+    border: 1px solid blue;
+}
+
+#stats-background{
+    background-image: url('../../assets/stats-background.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
+    height: 87.8vh;
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+#chart-container{
+    width: 50vw;
+    height: 60vh;
+    border: 1px solid white;
+}
+
+#stats-username{
+    text-align: center;
+}
+
+/* 1024 */
+@media (max-width: 1126px){
+    /* .button{
+        width: 200px;
+    } */
+}
+
+/* 768 */
+@media (max-width: 845px){
+    /* .button{
+        width: 200px;
+    } */
+}
+
+/* 460 */
+@media (max-width: 528px){
+    
+}
+
+/* 360 */
+@media(max-width: 396px){
+    
+}

@@ -14,7 +14,6 @@ export class Main extends Component{
         
         return(
             <>
-                <h1>Main</h1>
                 {this.props.children}
             </>
         )

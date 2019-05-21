@@ -1,0 +1,142 @@
+/* defined in Login.css */
+/* 
+    .button
+*/
+
+/* rgb(48, 116, 194 */
+
+.blue{
+    border: rgb(29, 112, 206);
+    background-color: rgb(48, 116, 194);
+    text-shadow:0px 1px 0px #357ab2;
+}
+
+.blue:hover {
+	background-color:rgb(35, 87, 146);
+}
+
+.registry-background{
+    /* background-image: url('../assets/registry-background.jpg') */
+    background-color: rgb(48, 116, 194);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.registry-form{
+    background-color: rgb(31, 31, 31);
+    width: 50vw;
+    height: 90vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);
+}
+
+#header-text{
+    color: white;
+    display: inline-box;
+    width: fit-content;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+
+.registry-options{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    height: 55vh;
+}
+
+.input-registry{
+    height: 2rem;
+    border: transparent;
+    border-bottom: 3px solid rgb(48, 116, 194);
+    background-color: rgb(31,31,31);
+    color: white;
+    width: 25vw;
+}
+
+#registry-error{
+    color: rgb(48, 116, 194);
+    text-align: center;
+}
+
+.first{
+    margin-top: 3rem;
+}
+
+.last{
+    margin-top: 1.5rem;
+}
+
+/* 1024 */
+@media (max-width: 1126px){
+    .registry-form{
+        width: 788px
+    }
+    .input-registry{
+        width: 525px;
+    }
+    .first{
+        margin-top: 1rem;
+    }
+    .button{
+        font-size: 25px;
+    }
+}
+
+/* 768 */
+@media (max-width: 845px){
+    .registry-form{
+        width: 592px;
+        min-width: 567;
+    }
+    .input-registry{
+        width: 395px;
+    }
+    .button{
+        font-size: 25px;
+    }
+}
+
+/* 460 */
+@media (max-width: 528px){
+    .registry-form{
+        width: 360px;
+        min-width: 351px;
+    }
+    .input-registry{
+        width: 240px;
+    }
+    .button{
+        width: 150px;
+        font-size: 12px;
+        font-size: medium;
+    }
+    #header-text{
+        font-size: x-large;
+    }
+}
+
+/* 360 */
+@media(max-width: 396px){
+    .registry-form{
+        width: 300px;
+        min-width: 270px;
+    }
+    .input-registry{
+        width: 200px;
+    }
+    .button{
+        font-size: medium;
+    }
+    #header-text{
+        font-size: x-large;
+    }
+}
+    
+

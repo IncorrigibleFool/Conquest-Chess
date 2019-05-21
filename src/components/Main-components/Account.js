@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {Redirect, Link} from 'react-router-dom'
+import {Redirect} from 'react-router-dom'
 import axios from 'axios'
 import {connect} from 'react-redux';
 import {authenticate, updateId, updateUsername, updateName, updateStats, updateEmail} from '../../redux/reducer'
@@ -154,12 +154,6 @@ export class Account extends Component{
                     {confirm && <button onClick={this.cancelDelete}>Cancel</button>}
 
                 </div>
-                <div>
-                    <Link to='/main/lobby'>
-                        <button>Back</button>
-                    </Link>
-                </div>
-                
             </>
         )
     }

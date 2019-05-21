@@ -1,13 +1,13 @@
 import React, {Component} from 'react'
+import './Lobby.css'
 
 export default class Lobby extends Component{
     
     render(){
         return(
-            <>
-                <h3>Lobby</h3>
+            <div id='lobby-background'>
                 {this.props.children}
-            </>
+            </div>
         )
     }
 }

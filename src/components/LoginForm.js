@@ -71,7 +71,7 @@ export class LoginForm extends Component{
             <div className='login-form-container'>
                 <div className='login-form'>
                     <img id='logo' src={require("../assets/logo.png")} alt='logo'></img>
-                    <form id='login-options' onSubmit={this.handleSubmit}>
+                    <form className='login-options' onSubmit={this.handleSubmit}>
                         <input
                             className='input-login'
                             type='text'
@@ -88,22 +88,21 @@ export class LoginForm extends Component{
                             value={this.state.password}
                             onChange={this.handleUpdate}
                         />
-                        <button className='button'>Login</button>
+                        {
+                            !this.state.loginAttempt && !this.state.loginError &&
+                            <button className='button'>Login</button>
+                        }
+                        {
+                            this.state.loginAttempt &&
+                            <div className='circle-loader register-button'></div>
+                        }
+                        {this.state.loginError && <h3 id='login-error'>Username or password is incorrect. Please try again.</h3>}
                     </form>
-                    {this.state.loginError && <h3 id='login-error'>Username or password is incorrect. Please try again.</h3>}
-                    {
-                        !this.state.loginAttempt &&
-                        <Link to='/register'>
-                            <button className='button'>Register</button>
-                        </Link>
-                    }
-                    {
-                        this.state.loginAttempt &&
-                        <div className='circle-loader'></div>
-                    }
+                    <Link id='register-button-container' to='/register'>
+                        <button  className='button'>Register</button>
+                    </Link>
                 </div>
             </div>
-            
         )
     }
     

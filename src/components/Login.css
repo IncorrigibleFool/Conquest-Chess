@@ -1,6 +1,7 @@
 *{
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
 }
 .login-container{
     height: 100vh;
@@ -16,7 +17,7 @@
 }
 
 #logo{
-    margin-top: 1.5rem;
+    margin-top: 2rem;
     height: 230px;
     width: 624px;
 }
@@ -39,16 +40,19 @@
     background-color: rgb(31, 31, 31);
     height: 90vh;
     width: 50vw;
+    min-width: 700px;
     box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);
 }
 
-#login-options{
+.login-options{
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     height:30vh;
     margin-top: 5vh;
     align-items: center;
+
+    /* border: 1px solid yellow; */
 }
 
 .input-login{
@@ -61,7 +65,10 @@
 }
 
 #login-error{
-    color: #ff0000;
+    color: white;
+    width: 80%;
+    text-align: center;
+    word-wrap: normal;
 }
 
 .circle-loader{
@@ -74,13 +81,11 @@
 }
 
 .button {
-	-moz-box-shadow:inset 0px -3px 7px 0px #f86656;
-	-webkit-box-shadow:inset 0px -3px 7px 0px #f86656;
-	box-shadow:inset 0px -3px 7px 0px #f86656;
 	background-color:#ff0000;
 	-moz-border-radius:3px;
 	-webkit-border-radius:3px;
-	border-radius:3px;
+    border-radius:3px;
+    text-decoration: none;
 	border:1px solid #d83526;
 	display:inline-block;
 	cursor:pointer;
@@ -89,14 +94,18 @@
 	font-size:15px;
 	padding:9px 23px;
 	text-decoration:none;
-	text-shadow:0px 1px 0px #b23e35;
+    text-shadow:0px 1px 0px #b23e35;
 }
 .button:hover {
-	background-color:#df0000;
+	background-color:#cc0000;
 }
 .button:active {
 	position:relative;
 	top:1px;
+}
+
+#register-button-container{
+    margin-top: 2rem;
 }
   
 @keyframes spin {
@@ -120,12 +129,14 @@
 
 /* 1024 */
 @media (max-width: 1126px){
-    #logo{
-        height: 282px;
-        width: 760px;
-    }
     .login-form{
         width: 788px
+    }
+    .input-login{
+        width: 525px;
+    }
+    .button{
+        width: 150px;
     }
 }
 
@@ -136,7 +147,11 @@
         width: 567px;
     }
     .login-form{
-        width: 592px
+        width: 592px;
+        min-width: 567;
+    }
+    .input-login{
+        width: 395px;
     }
 }
 
@@ -148,6 +163,10 @@
     }
     .login-form{
         width: 360px;
+        min-width: 351px;
+    }
+    .input-login{
+        width: 240px;
     }
 }
 
@@ -159,5 +178,9 @@
     }
     .login-form{
         width: 300px;
+        min-width: 270px;
+    }
+    .input-login{
+        width: 200px;
     }
 }

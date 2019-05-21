@@ -1,0 +1,19 @@
+#lobby-background{
+    background-image: url('../../assets/lobby-background.jpg');
+    background-repeat: no-repeat;
+    background-position: center bottom;
+    background-size: cover;
+    background-attachment: scroll;
+    height: 87.8vh;
+    display: flex;
+    justify-content: space-evenly;
+
+}
+
+#matchmaker-container{
+
+}
+
+#lobby-chat-container{
+    
+}

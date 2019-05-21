@@ -3,6 +3,7 @@ import axios from 'axios';
 import {Redirect, Link} from 'react-router-dom'
 import {authenticate, updateId, updateUsername, updateName, updateStats, updateEmail} from '../redux/reducer'
 import {connect} from 'react-redux'
+import './Register.css'
 
 export class RegisterForm extends Component {
     constructor(){
@@ -57,7 +58,6 @@ export class RegisterForm extends Component {
             })
         }
     }
-
     
     render(){
         if(this.state.registrationSuccess){
@@ -65,45 +65,51 @@ export class RegisterForm extends Component {
         }
 
         return(
-            <>
-            <form onSubmit={this.handleSubmit}>
-                <input
-                    name='firstname'
-                    placeholder='Name'
-                    value={this.state.firstname}
-                    onChange={this.handleUpdate}
-                />
-                <input
-                    name='lastname'
-                    placeholder='Last name'
-                    value={this.state.lastname}
-                    onChange={this.handleUpdate}
-                />
-                <input
-                    name='email'
-                    placeholder='Email'
-                    value={this.state.email}
-                    onChange={this.handleUpdate}
-                />
-                <input
-                    name='username'
-                    placeholder='Username'
-                    value={this.state.username}
-                    onChange={this.handleUpdate}
-                />
-                <input
-                    name='password'
-                    placeholder='Password'
-                    value={this.state.password}
-                    onChange={this.handleUpdate}
-                />
-                <button>Submit</button>
-            </form>
-            {this.state.registrationError && <h3>Error in registration. Please try again.</h3>}
-            <Link to='/login'>
-                <button>Back</button>
-            </Link>
-            </>
+            <div className='registry-form'>
+                <h1 id='header-text'>Welcome, new tactitian!</h1>
+                <form className='registry-options' onSubmit={this.handleSubmit}>
+                    <input
+                        className='input-registry'
+                        name='firstname'
+                        placeholder='Name'
+                        value={this.state.firstname}
+                        onChange={this.handleUpdate}
+                    />
+                    <input
+                        className='input-registry'
+                        name='lastname'
+                        placeholder='Last name'
+                        value={this.state.lastname}
+                        onChange={this.handleUpdate}
+                    />
+                    <input
+                        className='input-registry'
+                        name='email'
+                        placeholder='Email'
+                        value={this.state.email}
+                        onChange={this.handleUpdate}
+                    />
+                    <input
+                        className='input-registry'
+                        name='username'
+                        placeholder='Username'
+                        value={this.state.username}
+                        onChange={this.handleUpdate}
+                    />
+                    <input
+                        className='input-registry'
+                        name='password'
+                        placeholder='Password'
+                        value={this.state.password}
+                        onChange={this.handleUpdate}
+                    />
+                    {!this.state.registrationError && <button type='submit' className='button blue first'>Register</button>}
+                    {this.state.registrationError && <h3 id='registry-error'>Error in registration. Please try again.</h3>}
+                    <Link id='back-container' to='/login'>
+                        <button id='back-button' className='button blue last'>Back</button>
+                    </Link>
+                </form>
+            </div>
         )
     }
 }

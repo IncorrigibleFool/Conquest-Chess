@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "main": "./server/index.js",
-  "proxy": "http://localhost:3333",
+  "proxy": "http://127.0.0.1:3333",
   "dependencies": {
     "axios": "^0.18.0",
     "bcryptjs": "^2.4.3",

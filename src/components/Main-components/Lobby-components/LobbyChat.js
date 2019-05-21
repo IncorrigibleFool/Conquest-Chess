@@ -46,7 +46,7 @@ export class LobbyChat extends Component{
             </div>
         ))
         return(
-            <>
+            <div id='lobby-chat-container'>
                 <h4>Lobby Chat</h4>
                 {messages}
                 <input 
@@ -55,7 +55,7 @@ export class LobbyChat extends Component{
                     value={this.state.message}
                 />
                 <button onClick={this.submitMessage}>Submit</button>
-            </>
+            </div>
         )
     }
 }

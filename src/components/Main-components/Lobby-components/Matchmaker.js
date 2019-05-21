@@ -155,9 +155,11 @@ export class Matchmaker extends Component{
             )
         })
         return(
-            <>
-                <h4>Matchmaker</h4>
-                {rooms}
+            <div id='matchmaker-container'>
+                <h4>Available Games</h4>
+                <div>
+                    {rooms}
+                </div>
                 <input
                     onChange={this.handleInput}
                     placeholder='Room name'
@@ -175,7 +177,7 @@ export class Matchmaker extends Component{
                     </Link>
                 }
                 {this.state.nameTaken && <p>Room already exists.</p>}
-            </>
+            </div>
         )
     }
 }
