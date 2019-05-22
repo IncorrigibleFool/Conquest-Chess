@@ -5,14 +5,15 @@ import io from 'socket.io-client'
 import {connect} from 'react-redux'
 
 export class Matchmaker extends Component{
-    constructor(){
-        super()
+    constructor(props){
+        super(props)
         this.state = {
             rooms: [],
             roomName: '',
             color: 'b',
             chosenColor: 'w',
-            nameTaken: false
+            nameTaken: false,
+            tooLong: false
         }
         this.handleInput = this.handleInput.bind(this)
         this.socket = io.connect()
@@ -39,7 +40,7 @@ export class Matchmaker extends Component{
                 return
             }
             //catches instances where the server messes up and doesn't disconnect all listeners
-            if(data.connections.length){
+            if(data.connections){
                 if(data.connections.length === 1){
                     const index = this.state.rooms.indexOf(data.room)
                     let tempArr = this.state.rooms
@@ -94,6 +95,16 @@ export class Matchmaker extends Component{
         await this.setState({
             [event.target.name]: event.target.value
         })
+        if(this.state.roomName.length > 20){
+            this.setState({
+                tooLong: true
+            })
+        }
+        if(this.state.roomName.length <= 20){
+            this.setState({
+                tooLong: false
+            })
+        }
         const exists = this.state.rooms.some(index => {
             return this.state.roomName === index.name
         })
@@ -136,47 +147,63 @@ export class Matchmaker extends Component{
                 challengerColor = 'White'
             }
             if(room.players.length >= 2)return(
-                <div key={i}>
+                <div className='room' key={i}>
                     <h3>{room.name}</h3>
                     <h4>{`${room.players[0]} (${color}) vs ${room.players[1]} (${challengerColor})`}</h4>
                     <Link to={{pathname: `/main/game/${room.name}`, state: {color: null, player: false}}}>
-                        <button>Watch</button>
+                        <button className='matchmaker-button blue'>Watch</button>
                     </Link>
                 </div>
             )
             return(
-                <div key={i}>
+                <div className='room' key={i}>
                     <h3>{room.name}</h3>
                     <h4>{`${room.players[0]} (${color})`} seeking opponent</h4>
                     <Link to ={{pathname:`/main/game/${room.name}`, state: {color: room.color, player: true}}}>
-                        <button onClick={() => this.enterRoom(i)}>Enter</button>
+                        <button className='matchmaker-button blue' onClick={() => this.enterRoom(i)}>Challenge</button>
                     </Link>
                 </div>
             )
         })
+
+        var hidden = ''
+        if(!this.props.hideChat){
+            hidden = 'show'
+        }
+        else{
+            hidden = 'hidden-container'
+        }
         return(
-            <div id='matchmaker-container'>
-                <h4>Available Games</h4>
-                <div>
-                    {rooms}
+            <div id='matchmaker-container' className={hidden}>
+                <div className='title'>Games</div>
+                <div id='rooms-box'>
+                    {this.state.rooms.length > 0 && rooms}
+                    {this.state.rooms.length === 0 && <div>No available games.</div>}
                 </div>
-                <input
-                    onChange={this.handleInput}
-                    placeholder='Room name'
-                    name='roomName'
-                    value={this.state.roomName}
-                />
-                <select onChange={this.handleOption} name='color' value={this.state.color}>
-                    <option value='b'>White</option>
-                    <option value='w'>Black</option>
-                </select>
-                {
-                    !this.state.nameTaken &&
-                    <Link to={{pathname: `/main/game/${this.state.roomName}`, state:{color: this.state.chosenColor, player: true}}}>
-                        <button onClick={this.newRoom}>Make Room</button>
-                    </Link>
-                }
-                {this.state.nameTaken && <p>Room already exists.</p>}
+                <div id='room-maker'>
+                    <div id='maker-options'>
+                        <input
+                            id='room-maker-input'
+                            onChange={this.handleInput}
+                            placeholder='Room name'
+                            name='roomName'
+                            value={this.state.roomName}
+                        />
+                        <select id='color-select' onChange={this.handleOption} name='color' value={this.state.color}>
+                            <option value='b'>White</option>
+                            <option value='w'>Black</option>
+                        </select>
+                    </div>
+                    
+                    {
+                        !this.state.nameTaken && !this.state.tooLong &&
+                        <Link to={{pathname: `/main/game/${this.state.roomName}`, state:{color: this.state.chosenColor, player: true}}}>
+                            <button className='button' onClick={this.newRoom}>Create</button>
+                        </Link>
+                    }
+                    {this.state.nameTaken && <p className='white-text'>Room already exists.</p>}
+                    {this.state.tooLong && <p className='white-text'>Room name too long.</p>}
+                </div>
             </div>
         )
     }

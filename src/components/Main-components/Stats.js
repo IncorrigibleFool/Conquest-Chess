@@ -1,5 +1,4 @@
 import React, {Component} from 'react'
-import {Link} from 'react-router-dom'
 import {Pie} from 'react-chartjs-2'
 import {connect} from 'react-redux'
 import './Stats.css'
@@ -24,7 +23,7 @@ export class Stats extends Component{
                 draws,
                 points
             })
-        }, 300)
+        }, 200)
     }
 
     render(){
@@ -32,12 +31,9 @@ export class Stats extends Component{
         
         if(wins === 0 && losses === 0 && draws ===0){
             return(
-                <>
+                <div>
                     <h3>No record yet exists of your triumphs. Go forth and conquer, brave tactician!</h3>
-                    <Link to='/main/lobby'>
-                        <button>Back</button>
-                    </Link>
-                </>
+                </div>
             )
         }
         
@@ -53,7 +49,7 @@ export class Stats extends Component{
                                 backgroundColor: ['blue', 'red', 'yellow']
                             }], 
                             labels: ['Wins', 'Losses', 'Draws']}}
-                        //options={{animation: {duration: 5000}}}
+                        options={{animation: {duration: 1500}}}
                     />
                 </div>
                 <div>

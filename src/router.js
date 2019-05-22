@@ -7,8 +7,6 @@ import RegisterForm from './components/RegisterForm'
 import Main from './components/Main'
 import Navbar from './components/Main-components/Navbar'
 import Lobby from './components/Main-components/Lobby'
-import LobbyChat from './components/Main-components/Lobby-components/LobbyChat'
-import Matchmaker from './components/Main-components/Lobby-components/Matchmaker'
 import Stats from './components/Main-components/Stats'
 import Account from './components/Main-components/Account'
 import Game from './components/Main-components/Game'
@@ -35,10 +33,7 @@ export default (
         <Route path='/main/lobby' component={() => (
             <Main>
                 <Navbar>
-                    <Lobby>
-                        <Matchmaker/>
-                        <LobbyChat/>
-                    </Lobby>
+                    <Lobby/>
                 </Navbar>
             </Main>
         )}/>

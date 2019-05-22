@@ -3,8 +3,8 @@ import io from 'socket.io-client'
 import {connect} from 'react-redux'
 
 export class LobbyChat extends Component{
-    constructor(){
-        super()
+    constructor(props){
+        super(props)
         this.state ={
             messages: [],
             message: ''
@@ -24,6 +24,12 @@ export class LobbyChat extends Component{
         })
     }
 
+    handleKeyPress = (event) => {
+        if(event.which === 13){
+            this.submitMessage()
+        }
+    }
+
     submitMessage = () => {
         this.socket.emit('lobby message', {username: this.props.username, message: this.state.message})
         this.setState({
@@ -40,21 +46,38 @@ export class LobbyChat extends Component{
 
     render(){
         const messages = this.state.messages.map((message, index) => (
-            <div key={index}>
-                <h5>{message.username}: </h5>
-                <p>{message.message}</p>
+            <div className='message-container' key={index}>
+                <div className='message'>
+                    <div id='username'>{message.username}: </div>
+                    <div>{message.message}</div>
+                </div>
             </div>
         ))
+
+        var hidden = ''
+        if(this.props.hideChat){
+            hidden = 'show'
+        }
+        else{
+            hidden = 'hidden-container'
+        }
         return(
-            <div id='lobby-chat-container'>
-                <h4>Lobby Chat</h4>
-                {messages}
-                <input 
-                    onChange={this.handleChange}
-                    name='message'
-                    value={this.state.message}
-                />
-                <button onClick={this.submitMessage}>Submit</button>
+            <div id='lobby-chat-container' className={hidden}>
+                <div className='title'>Lobby Chat</div>
+                <div id='message-box'>
+                    {messages}
+                </div>
+                <div id='chat-input'>
+                    <input 
+                        id='lobby-chat-input'
+                        placeholder='Chat text'
+                        onChange={this.handleChange}
+                        name='message'
+                        value={this.state.message}
+                        onKeyPress={this.handleKeyPress}
+                    />
+                    <button className='button message-button' onClick={this.submitMessage}>Submit</button>
+                </div>
             </div>
         )
     }

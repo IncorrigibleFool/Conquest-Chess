@@ -65,6 +65,11 @@ io.on('connection', socket => {
         if(room === undefined){
             ctrl.deleteRoom(data.room)
         }
+        if(room){
+            if(room.length === 1){
+                ctrl.deleteRoom(data.room)
+            }
+        }
         io.in(data.room).emit('leave room', data)
         io.sockets.emit('room update', {room: data.room, connections : room})
     })

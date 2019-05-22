@@ -25,7 +25,7 @@ export class Navbar extends Component{
         try{
             await axios.delete('/auth/logout')
             
-            this.setState({
+            await this.setState({
                 logout: true
             })
 
@@ -67,17 +67,17 @@ export class Navbar extends Component{
                         {
                             this.state.menu &&
                             <div id='nav-menu-options'>
-                                <button onClick={this.menu} className='button' id='nav-menu'>Close</button>
+                                <button onClick={this.menu} className='button' id='nav-option'>Close</button>
                                 <Link to='/main/lobby'>
-                                    <button className='button' id='nav-menu'>Lobby</button>
+                                    <button className='button' id='nav-option'>Lobby</button>
                                 </Link>
                                 <Link to='/main/stats'>
-                                    <button className='button' id='nav-menu'>Stats</button>
+                                    <button className='button' id='nav-option'>Stats</button>
                                 </Link>
                                 <Link to='/main/account'>
-                                    <button className='button' id='nav-menu'>Account</button>
+                                    <button className='button' id='nav-option'>Account</button>
                                 </Link>
-                                <button className='button' id='nav-menu' onClick={this.logout}>Logout</button>
+                                <button className='button' id='nav-option' onClick={this.logout}>Logout</button>
                             </div>
                         }
                     </div>
