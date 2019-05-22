@@ -1,0 +1,105 @@
+#waiting-screen{
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#cancel-button{
+    margin-top: 30px;
+}
+
+#turn{
+    text-align: center;
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+#game-container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#game-chat-box{
+    border: 1px solid black;
+    overflow-y: scroll;
+    height: 50vh;
+}
+
+#game-chat-bar{
+    display: flex;
+    justify-content: center;
+}
+
+#game-chat-input{
+    margin-top: 20px;
+    margin-bottom: 20px;
+    width: 50%;
+}
+
+#game-chat-container{
+    margin-top: 30px;
+
+}
+
+.popup {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.popup-inner{
+    background-color: white;
+    height: 25%;
+    width: 25%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.balls {
+    margin-top: 50px;
+    width: 3.5em;
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .balls div {
+    width: 0.8em;
+    height: 0.8em;
+    border-radius: 50%;
+    background-color: #ff0000;
+    transform: translateY(-100%);
+    animation: wave 0.8s ease-in-out alternate infinite;
+  }
+  
+  .balls div:nth-of-type(1) {
+    animation-delay: -0.4s;
+  }
+  
+  .balls div:nth-of-type(2) {
+    animation-delay: -0.2s;
+  }
+  
+  @keyframes wave {
+    from {
+      transform: translateY(-100%);
+    }
+    to {
+      transform: translateY(100%);
+    }
+  }

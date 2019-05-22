@@ -49,15 +49,14 @@ export class Stats extends Component{
                                 backgroundColor: ['blue', 'red', 'yellow']
                             }], 
                             labels: ['Wins', 'Losses', 'Draws']}}
-                        options={{animation: {duration: 1500}}}
+                        options={{animation: {duration: 1500}, maintainAspectRatio: false, responsive: true}}
                     />
                 </div>
-                <div>
+                {/* <div>
                     <h4>Wins: {wins}</h4>
                     <h4>Losses: {losses}</h4>
                     <h4>Draws: {draws}</h4>
-                </div>
-                
+                </div> */}
             </div>
         )
     }

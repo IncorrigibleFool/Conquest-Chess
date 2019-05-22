@@ -5,8 +5,10 @@ import Chessboard from 'chessboardjsx'
 import io from 'socket.io-client'
 import GameChat from './GameChat'
 import axios from 'axios'
+import {Link, Redirect} from 'react-router-dom'
 import {connect} from 'react-redux'
 import {updateStats} from '../../../redux/reducer'
+import './Game.css'
 
 class HumanVsHuman extends Component{
     static propTypes = { children: PropTypes.func };
@@ -37,6 +39,7 @@ class HumanVsHuman extends Component{
         opponent: null,
         victory: false
       };
+      this.leaveRoom = this.leaveRoom.bind(this)
       this.leftRoom = this.leftRoom.bind(this)
       this.handleGameResult = this.handleGameResult.bind(this)
       this.onSquareClick = this.onSquareClick.bind(this)
@@ -107,6 +110,12 @@ class HumanVsHuman extends Component{
       await axios.put('/api/stats/update', {wins, losses, draws, points})
       this.props.updateStats({wins, losses, draws, points})
     }
+  }
+
+  async leaveRoom(){
+    await this.socket.emit('leave room', {room: this.props.room, username: this.props.username, id: this.props.id})
+    this.socket.disconnect()
+    return <Redirect to='/main/lobby'/>
   }
 
   //updates stats on win, loss or draw and updates state to display appropriate image for each scenario
@@ -273,10 +282,23 @@ class HumanVsHuman extends Component{
 
   render() {
     const { fen, dropSquareStyle, squareStyles, gameOver, checkmate, check, draw, stalemate, lackMaterial, threefold, turn, opponent} = this.state;
-    const {room, username, player} = this.props
+    const {room, username, player, color} = this.props
 
     if(opponent === null && player){
-      return(<h1>Awaiting opponent</h1>)
+      return(
+        <div id='waiting-screen'>
+          <audio src={require("../../../assets/preparations.mp3")} autoPlay loop/>
+          <h1>Awaiting opponent</h1>
+          <div className='balls'>
+            <div></div>
+            <div></div>
+            <div></div>
+          </div>
+          <Link to='/main/lobby'>
+            <button id='cancel-button' className='button' onClick={this.leaveRoom}>Cancel</button>
+          </Link>
+        </div>
+      )
     }
     else{
       return this.props.children({
@@ -289,6 +311,7 @@ class HumanVsHuman extends Component{
         onDragOverSquare: this.onDragOverSquare,
         onSquareClick: this.onSquareClick,
         onSquareRightClick: this.onSquareRightClick,
+        leaveRoom: this.leaveRoom,
         //GameChat props
         room,
         username,
@@ -299,7 +322,8 @@ class HumanVsHuman extends Component{
         stalemate,
         lackMaterial,
         threefold,
-        turn
+        turn,
+        color
       });
     }
   }
@@ -325,6 +349,13 @@ const squareStyling = ({ pieceSquare, history }) => {
   };
 
 export function PvPGame(props) {
+  var song = ''
+  var num = Math.floor(Math.random() * 4) + 1
+  if(num === 1){ song = 'destiny'}
+  if(num === 2){ song = 'duty'}
+  if(num === 3){ song = 'march'}
+  if(num === 4){ song = 'prelude'}
+  
   return (
     <>
       <HumanVsHuman
@@ -349,6 +380,7 @@ export function PvPGame(props) {
           onDragOverSquare,
           onSquareClick,
           onSquareRightClick,
+          leaveRoom,
           room,
           username,
           gameOver,
@@ -358,12 +390,44 @@ export function PvPGame(props) {
           stalemate,
           lackMaterial,
           threefold,
-          turn
+          turn,
+          color
         }) => (
-          <>
+          <div id='game-container'>
+            <div
+              gameOver={gameOver}
+              check={check}
+              checkmate={checkmate}
+              turn={turn}
+              color={color}
+              leaveRoom={leaveRoom}
+            >
+              {!gameOver && !check && <audio src={require(`../../../assets/${song}.mp3`)} autoPlay loop/>}
+              {check && !checkmate && <audio src={require('../../../assets/danger.mp3')} autoPlay loop/>}
+              {gameOver && turn !== color && <audio src={require('../../../assets/victory.mp3')} autoPlay loop/>}
+              {
+                gameOver && turn !== color && 
+                <div className='popup'>
+                  <div className='popup-inner'>
+                    <h1>Victory!</h1>
+                      <button onClick={leaveRoom} className='button'>Return</button>
+                  </div>
+                </div>
+              }
+              {gameOver && turn === color && <audio src={require('../../../assets/defeat.mp3')} autoPlay loop/>}
+              {
+                gameOver && turn === color && 
+                <div className='popup'>
+                  <div className='popup-inner'>
+                    <h1>Defeat...</h1>
+                      <button onClick={leaveRoom} className='button'>Return</button>
+                  </div>
+                </div>
+              }
+            </div>
             <Chessboard
               id="humanVsHuman"
-              width={520}
+              width={560}
               position={position}
               onDrop={onDrop}
               onMouseOverSquare={onMouseOverSquare}
@@ -390,8 +454,9 @@ export function PvPGame(props) {
               lackMaterial={lackMaterial}
               threefold={threefold}
               turn={turn}
+              color={color}
             />
-          </>
+          </div>
         )}
       </HumanVsHuman>
     </>

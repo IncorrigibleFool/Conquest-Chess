@@ -1,7 +1,3 @@
-#chart{
-    border: 1px solid blue;
-}
-
 #stats-background{
     background-image: url('../../assets/stats-background.jpg');
     background-size: cover;
@@ -15,35 +11,10 @@
 }
 
 #chart-container{
-    width: 50vw;
-    height: 60vh;
-    border: 1px solid white;
+    width: 80%;
+    height: 70%;
 }
 
 #stats-username{
     text-align: center;
-}
-
-/* 1024 */
-@media (max-width: 1126px){
-    /* .button{
-        width: 200px;
-    } */
-}
-
-/* 768 */
-@media (max-width: 845px){
-    /* .button{
-        width: 200px;
-    } */
-}
-
-/* 460 */
-@media (max-width: 528px){
-    
-}
-
-/* 360 */
-@media(max-width: 396px){
-    
 }

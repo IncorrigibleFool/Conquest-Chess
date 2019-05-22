@@ -43,6 +43,16 @@ export default class GameChat extends Component{
                 messages: [...this.state.messages, {message: 'Checkmate!'}]
             })
         }
+        if(this.props.gameOver && this.props.turn !== this.props.color && !this.props.draw){
+            this.setState({
+                messages: [...this.state.messages, {message: 'Victory!'}]
+            })
+        }
+        if(this.props.gameOver && this.props.turn === this.props.color && !this.props.draw){
+            this.setState({
+                messages: [...this.state.messages, {message: 'Defeat...'}]
+            })
+        }
         if(this.props.stalemate){
             this.setState({
                 messages: [...this.state.messages, {message: 'Draw due to stalemate.'}]
@@ -72,6 +82,10 @@ export default class GameChat extends Component{
         })
     }
 
+    leaveRoom = () => {
+        this.socket.emit('leave room', {room: this.props.room})
+    }
+
     newMessage = (event) => {
         event.preventDefault()
         const {username, room} = this.props
@@ -99,39 +113,50 @@ export default class GameChat extends Component{
         const messages = this.state.messages.map((message, index) => {
             if(message.username){
                 return(
-                    <div key={index}>
-                        <h5>{message.username}: </h5>
-                        <p>{message.message}</p>
+                    <div className='message' key={index}>
+                        <div id='username'>{message.username}: </div>
+                        <div>{message.message}</div>
                     </div>
                 )
             }
 
             return(
-                <div key={index}>
+                <div className='message' key={index}>
                     <p>{message.message}</p>
                 </div>
             )
         })
 
+        // var song = ''
+        // var num = Math.floor(Math.random() * 4) + 1
+        // if(num === 1){ song = 'destiny'}
+        // if(num === 2){ song = 'duty'}
+        // if(num === 3){ song = 'march'}
+        // if(num === 4){ song = 'prelude'}
+
         return(
             <>
-                <h3>
+            <div id='game-chat-container'>
+                <h3 id='turn'>
                     {!this.state.blackTurn && <p>White's Turn</p>}
                     {this.state.blackTurn && <p>Black's Turn</p>}
                 </h3>
-                <div>
+                <div id='game-chat-box'>
                     <p>Left click on a piece then left click again on a legal square to move, or drag and drop.</p>
                     <p>Right click anywhere to cancel your selected square.</p>
                     <p>Promotions will always result in a queen.</p>
                     <p>Good luck!</p>
                     {messages}
-                    <form onSubmit={this.newMessage}>
-                        <input
-                            onChange={this.handleMessageUpdate}
-                            value={this.state.message}
-                        />
-                    </form>    
                 </div>
+                <form id='game-chat-bar' onSubmit={this.newMessage}>
+                    <input
+                        placeholder='Chat text'
+                        id='game-chat-input'
+                        onChange={this.handleMessageUpdate}
+                        value={this.state.message}
+                    />
+                </form>
+            </div>
             </>
         )
     }
