@@ -52,6 +52,7 @@ io.on('connection', socket => {
     //rooms
     socket.on('join room', data => {
         socket.join(data.room)
+        var room = io.sockets.adapter.rooms[data.room]
         socket.to(data.room).emit('join room', data)
     })
 
@@ -64,11 +65,6 @@ io.on('connection', socket => {
         var room = io.sockets.adapter.rooms[data.room]
         if(room === undefined){
             ctrl.deleteRoom(data.room)
-        }
-        if(room){
-            if(room.length === 1){
-                ctrl.deleteRoom(data.room)
-            }
         }
         io.in(data.room).emit('leave room', data)
         io.sockets.emit('room update', {room: data.room, connections : room})

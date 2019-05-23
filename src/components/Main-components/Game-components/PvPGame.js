@@ -16,15 +16,18 @@ class HumanVsHuman extends Component{
     constructor(props){
       super(props)
       this.state = {
+        // if true, sends player back to lobby after game over
+        redirect: false,
         gameOver: false,
         checkmate: false,
         check: false,
+        // if draw is true and stalemate, lackMaterial, and threefold are false, draw by 50-move rule
         draw: false,
         stalemate: false,
         lackMaterial: false,
         threefold: false,
+        // 'w' = white, 'b' = black
         turn: 'w',
-        prematureEnd: true,
         fen: "start",
         // square styles for active drop square
         dropSquareStyle: {},
@@ -36,8 +39,9 @@ class HumanVsHuman extends Component{
         square: "",
         // array of past game moves
         history: [],
+        // array of chat messages that is displayed in GameChat
+        messages: [],
         opponent: null,
-        victory: false
       };
       this.leaveRoom = this.leaveRoom.bind(this)
       this.leftRoom = this.leftRoom.bind(this)
@@ -52,6 +56,7 @@ class HumanVsHuman extends Component{
       this.socket.on('join room', data => this.joinRoom(data))
       this.socket.on('join response', data => this.joinResponse(data))
       this.socket.on('leave room', data => this.leftRoom(data))
+      this.socket.on('room message', data => this.updateMessages(data))
     }
 
   componentDidMount() {
@@ -73,7 +78,6 @@ class HumanVsHuman extends Component{
       lackMaterial: this.game.insufficient_material(),
       threefold: this.game.in_threefold_repetition(),
       turn: this.game.turn(),
-      prematureEnd: !this.game.game_over(),
       fen: this.game.fen(),
       history: this.game.history({ verbose: true }),
       squareStyles: squareStyling({ pieceSquare, history })
@@ -102,8 +106,13 @@ class HumanVsHuman extends Component{
 
   //penalizes opponent who left early with a loss and awards remaining player a win
   async leftRoom(data){
+    if(data.username !== undefined){
+      this.setState({
+        messages: [...this.state.messages, {message: `${data.username} has left the room.`}]
+      })
+    }
     if(!this.props.player) return
-    if(this.state.prematureEnd && this.state.opponent === data.id){
+    if(!this.state.gameOver && this.state.opponent === data.id){
       await axios.put('/api/stats/penalty', {id: data.id})
       var {wins, losses, draws, points} = this.props
       wins += 1
@@ -115,10 +124,69 @@ class HumanVsHuman extends Component{
   async leaveRoom(){
     await this.socket.emit('leave room', {room: this.props.room, username: this.props.username, id: this.props.id})
     this.socket.disconnect()
-    return <Redirect to='/main/lobby'/>
+    await this.setState({
+      redirect: true
+    })
   }
 
-  //updates stats on win, loss or draw and updates state to display appropriate image for each scenario
+  // shows new messages received via socket
+  updateMessages = (data) => {
+    const {message, username} = data
+    this.setState({
+        messages: [...this.state.messages,{username, message}]
+    })
+  }
+
+  // emits created message
+  newMessage = (message) => {
+    const {username, room} = this.props
+    this.socket.emit('room message', {username, message, room})
+  }
+
+  handleChat = () => {
+    if(this.props.check && !this.props.checkmate){
+      this.setState({
+          messages: [...this.state.messages, {message: 'Check!'}]
+      })
+    }
+    if(this.props.check && this.props.checkmate){
+        this.setState({
+            messages: [...this.state.messages, {message: 'Checkmate!'}]
+        })
+    }
+    if(this.props.gameOver && this.props.turn !== this.props.color && !this.props.draw){
+        this.setState({
+            messages: [...this.state.messages, {message: 'Victory!'}]
+        })
+    }
+    if(this.props.gameOver && this.props.turn === this.props.color && !this.props.draw){
+        this.setState({
+            messages: [...this.state.messages, {message: 'Defeat...'}]
+        })
+    }
+    if(this.props.stalemate){
+        this.setState({
+            messages: [...this.state.messages, {message: 'Draw due to stalemate.'}]
+        })
+    }
+    if(this.props.threefold){
+        this.setState({
+            messages: [...this.state.messages, {message: 'Draw due to threefold rule.'}]
+        })
+    }
+    if(this.props.lackMaterial){
+        this.setState({
+            messages: [...this.state.messages, {message: 'Draw due to lack of material.'}]
+        })
+    }
+    if(this.props.draw && !this.props.stalemate && !this.props.threefold && !this.props.lackMaterial){
+        this.setState({
+            messages: [...this.state.messages, {message: 'Draw due to 50-move rule.'}]
+        })
+    }
+  }
+
+  //updates stats on win, loss or draw
   async handleGameResult(){
     if(this.state.gameOver){
       if(this.state.checkmate && this.state.turn !== this.props.color){
@@ -126,9 +194,6 @@ class HumanVsHuman extends Component{
         wins += 1
         await axios.put('/api/stats/update', {wins, losses, draws, points})
         this.props.updateStats({wins, losses, draws, points})
-        this.setState({
-          victory: true
-        })
       }
       if(this.state.checkmate && this.state.turn === this.props.color){
         let {wins, losses, draws, points} = this.props
@@ -256,7 +321,6 @@ class HumanVsHuman extends Component{
       lackMaterial: this.game.insufficient_material(),
       threefold: this.game.in_threefold_repetition(),
       turn: this.game.turn(),
-      prematureEnd: !this.game.game_over(),
       fen: this.game.fen(),
       history: this.game.history({ verbose: true }),
     })
@@ -281,8 +345,8 @@ class HumanVsHuman extends Component{
   }
 
   render() {
-    const { fen, dropSquareStyle, squareStyles, gameOver, checkmate, check, draw, stalemate, lackMaterial, threefold, turn, opponent} = this.state;
-    const {room, username, player, color} = this.props
+    const { fen, dropSquareStyle, squareStyles, redirect, gameOver, checkmate, check, turn, opponent, messages} = this.state;
+    const {player, color} = this.props
 
     if(opponent === null && player){
       return(
@@ -311,17 +375,13 @@ class HumanVsHuman extends Component{
         onDragOverSquare: this.onDragOverSquare,
         onSquareClick: this.onSquareClick,
         onSquareRightClick: this.onSquareRightClick,
+        newMessage: this.newMessage,
         leaveRoom: this.leaveRoom,
-        //GameChat props
-        room,
-        username,
+        messages,
+        redirect,
         gameOver,
         checkmate,
         check,
-        draw,
-        stalemate,
-        lackMaterial,
-        threefold,
         turn,
         color
       });
@@ -381,20 +441,18 @@ export function PvPGame(props) {
           onSquareClick,
           onSquareRightClick,
           leaveRoom,
-          room,
-          username,
+          newMessage,
+          messages,
+          redirect,
           gameOver,
           checkmate,
           check,
-          draw,
-          stalemate,
-          lackMaterial,
-          threefold,
           turn,
           color
         }) => (
           <div id='game-container'>
             <div
+              redirect={redirect}
               gameOver={gameOver}
               check={check}
               checkmate={checkmate}
@@ -402,6 +460,7 @@ export function PvPGame(props) {
               color={color}
               leaveRoom={leaveRoom}
             >
+              {redirect && <Redirect to='/main/lobby'/>}
               {!gameOver && !check && <audio src={require(`../../../assets/${song}.mp3`)} autoPlay loop/>}
               {check && !checkmate && <audio src={require('../../../assets/danger.mp3')} autoPlay loop/>}
               {gameOver && turn !== color && <audio src={require('../../../assets/victory.mp3')} autoPlay loop/>}
@@ -444,17 +503,8 @@ export function PvPGame(props) {
             />
             <GameChat
               id="gameChat"
-              room={room}
-              username={username}
-              gameOver={gameOver}
-              checkmate={checkmate}
-              check={check}
-              draw={draw}
-              stalemate={stalemate}
-              lackMaterial={lackMaterial}
-              threefold={threefold}
-              turn={turn}
-              color={color}
+              messages={messages}
+              newMessage={newMessage}
             />
           </div>
         )}

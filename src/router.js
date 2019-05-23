@@ -9,7 +9,6 @@ import Navbar from './components/Main-components/Navbar'
 import Lobby from './components/Main-components/Lobby'
 import Stats from './components/Main-components/Stats'
 import Account from './components/Main-components/Account'
-import Game from './components/Main-components/Game'
 import PvPGame from './components/Main-components/Game-components/PvPGame'
 
 export default (
@@ -51,11 +50,9 @@ export default (
                 </Navbar>
             </Main>
         )}/>
-        <Route path='/main/game/:room' render={(props) => (
+        <Route path='/main/game/:room' component={(props) => (
             <Main>
-                <Game {...props}>
-                    <PvPGame {...props}/>
-                </Game>
+                <PvPGame {...props}/>
             </Main>
         )}/>    
     </Switch>

@@ -190,7 +190,10 @@
         height: 35%;
     }
     #color-select{
-        width: 50%;
+        width: 60%;
         height: 35%;
+    }
+    .button{
+        width: 115px;
     }
 }
