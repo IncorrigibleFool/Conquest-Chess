@@ -52,7 +52,6 @@ io.on('connection', socket => {
     //rooms
     socket.on('join room', data => {
         socket.join(data.room)
-        var room = io.sockets.adapter.rooms[data.room]
         socket.to(data.room).emit('join room', data)
     })
 

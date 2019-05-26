@@ -14,6 +14,7 @@ export class Matchmaker extends Component{
             chosenColor: 'w',
             nameTaken: false,
             tooLong: false
+            
         }
         this.handleInput = this.handleInput.bind(this)
         this.socket = io.connect()
@@ -66,7 +67,12 @@ export class Matchmaker extends Component{
         this.socket.off('room update')
     }
 
+    nameAlert = () => {
+        alert('Please create a name for your room.')
+    }
+
     newRoom = () => {
+        if(!this.state.roomName) return
         const {roomName : name, color} = this.state
         const {username} = this.props
         axios.put('/api/rooms', {name, color, players: [username]}).then((res) => {
@@ -194,9 +200,9 @@ export class Matchmaker extends Component{
                             <option value='w'>Black</option>
                         </select>
                     </div>
-                    
+                    {!this.state.roomName && <button className='button' onClick={this.nameAlert}>Create</button>}
                     {
-                        !this.state.nameTaken && !this.state.tooLong &&
+                        !this.state.nameTaken && !this.state.tooLong && this.state.roomName &&
                         <Link to={{pathname: `/main/game/${this.state.roomName}`, state:{color: this.state.chosenColor, player: true}}}>
                             <button className='button' onClick={this.newRoom}>Create</button>
                         </Link>
